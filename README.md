@@ -4,13 +4,6 @@
 
 This addon is an extension for the **PartyBot Command Panel (PCP)** for World of Warcraft (WoW) 1.12.1 helps users efficiently fill a raid with bots and manage them through an intuitive command panel. It includes features for setting up bot configurations, managing presets for various dungeons and raids, and automating bot removal.
 
-
-
-
-
-
-
-
 ## Features
 
 - **Automated Interface Creation:**
@@ -66,6 +59,10 @@ The addon includes optimized presets for several dungeons and raids:
 - **AQ20:** Various presets for different bosses.
 - **Zul'Gurub (ZG):** Specific presets for each boss, including tanks, healers, and DPS roles.
 - **Blackwing Lair (BWL) and AQ40:** Configurations for raid encounters.
+
+## Editing Presets or Suppress bot messages
+- **SuppressBotMsg.lua** edit this file to add or change how often a message should be displayed
+- **Presets.lua** edit this file to add or change a preset
 
 
 ## License
