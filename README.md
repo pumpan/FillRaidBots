@@ -1,8 +1,8 @@
-#FillRaidBots
+# FillRaidBots
 
 ## Overview
 
-This addon is an extension for the **PartyBot Command Panel (PCP)** for World of Warcraft (WoW) 1.12.1 helps users efficiently fill a raid with bots and manage them through an intuitive command panel. It includes features for setting up bot configurations, managing presets for various dungeons and raids, and automating bot removal.
+This addon is an extension for the **PartyBot Command Panel (PCP)** for **World of Warcraft (WoW) 1.12.1** helps users efficiently fill a raid with bots and manage them through an intuitive command panel. It includes features for setting up bot configurations, managing presets for various dungeons and raids, and automating bot removal.
 
 ## Features
 
