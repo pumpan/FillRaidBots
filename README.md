@@ -4,22 +4,29 @@
 
 This addon is an extension for the **PartyBot Command Panel (PCP)** for World of Warcraft (WoW) 1.12.1 helps users efficiently fill a raid with bots and manage them through an intuitive command panel. It includes features for setting up bot configurations, managing presets for various dungeons and raids, and automating bot removal.
 
+
+
+
+
+
+
+
 ## Features
 
 - **Automated Interface Creation:**
   - Automatically creates and opens the "Fill Raid" and "Kick All" buttons when the PartyBot Command Panel is accessed.
-
+![Configuration Frame](ScreenShots/fillraidbots.png)
 - **Fill Raid Button:**
   - Opens a frame where users can specify the number of bots they want to add.
   - Allows users to choose from predefined presets for various raid instances, simplifying setup.
-
+![Preset Selection](ScreenShots/fillraidbots3.png)
 - **Kick All Button:**
   - Removes all bots from the raid while keeping one bot to avoid disbanding the raid.
 
 - **Settings Menu:**
   - Provides options to enable automatic dead bot removal.
   - Allows users to suppress bot messages for a cleaner interface.
-
+![Preset Selection](ScreenShots/fillraidbots4.png)
 ## Installation
 
 1. **Download the Addon:** 
