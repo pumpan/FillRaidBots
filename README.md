@@ -1,4 +1,4 @@
-# WoW FillRaidBots Addon
+#FillRaidBots
 
 ## Overview
 
