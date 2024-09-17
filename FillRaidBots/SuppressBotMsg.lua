@@ -5,6 +5,7 @@ messagesToHide = {
   ["All party bots are now attacking"] = 60,
   ["coming to your position."] = 60, 
   ["has joined the raid group"] = 60,
+  ["joins the party."] = 60,
   ["All party bots unpaused."] = 60,
   ["DPS will join in 30 seconds!"] = 60,  
   ["unpaused"] = 60,

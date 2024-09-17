@@ -52,42 +52,51 @@ end
 
 -- Function to process and send chat messages from the queue
 local function ProcessMessageQueue()
-  if next(messageQueue) ~= nil then -- Check if the queue is not empty
-      local messageInfo = table.remove(messageQueue, 1)
-      local message = messageInfo.message
-      local recipient = messageInfo.recipient
+    if next(messageQueue) ~= nil then -- Check if the queue is not empty
+        local messageInfo = table.remove(messageQueue, 1)
+        local message = messageInfo.message
+        local recipient = messageInfo.recipient
 
-      if recipient == "none" then
-          -- Handle notifications (not sent in chat)
-          DEFAULT_CHAT_FRAME:AddMessage(message)
-      else
-          -- Handle chat messages
-          SendChatMessage(message, recipient)
-      end
+        -- Handle debug messages: only display if debug mode is enabled
+        if recipient == "debug" then
+            if FillRaidBotsSavedSettings.debugMessagesEnabled then  
+                DEFAULT_CHAT_FRAME:AddMessage(message)
+            end
+            return 
+        end
 
-      if messageInfo.incrementBotCount then
-          botCount = botCount + 1
-          -- Remove the first bot after the tenth bot is added
-          if botCount == 10 and not initialBotRemoved then
-              if firstBotName then
-                  UninviteMember(firstBotName, "firstBotRemoved")
-              else
-                  QueueMessage("Error: First bot's name not captured.", "none")
-              end
-              initialBotRemoved = true
-          end
-      end
-  end
+        if recipient == "none" then
+            -- Handle notifications (not sent in chat)
+            DEFAULT_CHAT_FRAME:AddMessage(message)
+        else
+            -- Handle chat messages
+            SendChatMessage(message, recipient)
+        end
+
+        if messageInfo.incrementBotCount then
+            botCount = botCount + 1
+            -- Remove the first bot after the 10 bot is added
+            if botCount == 10 and not initialBotRemoved then
+                if firstBotName then
+                    UninviteMember(firstBotName, "firstBotRemoved")
+                else
+                    QueueMessage("Error: First bot's name not captured.", "none")
+                end
+                initialBotRemoved = true
+            end
+        end
+    end
 end
+
 
 -- Function to uninvite a specific member by their name
 function UninviteMember(name, reason)
     if name then
         UninviteByName(name)
         if reason == "dead" then
-            --QueueMessage(name .. " has been uninvited because they are dead.", "none")
+            QueueMessage(name .. " has been uninvited because they are dead.", "debug")
         elseif reason == "firstBotRemoved" then
-            --QueueMessage("10 bots added. Removing party bot: " .. name, "none")
+            QueueMessage("10 bots added. Removing party bot: " .. name, "debug")
 			firstBotName = nil
         end
        
@@ -100,10 +109,8 @@ local messagecantremove = false
 
 local function CheckAndRemoveDeadBots()
     if not FillRaidBotsSavedSettings.isCheckAndRemoveEnabled then return end
-    -- Get the player's name to avoid removing yourself
     local playerName = UnitName("player")
 
-    -- Check if we are in a raid
     if GetNumRaidMembers() > 0 then
         -- Ensure raid has at least 2 members before removing anyone
         if GetNumRaidMembers() > 2 then
@@ -118,16 +125,14 @@ local function CheckAndRemoveDeadBots()
             end
             messagecantremove = false -- Reset the flag if removal is possible
         elseif not messagecantremove then
-            --QueueMessage("Saving the last bot so the raid does not disband.", "none")
+            QueueMessage("Saving the last bot so the raid does not disband.", "debug")
             messagecantremove = true
         end
-        -- Check if we are in a party
     elseif GetNumPartyMembers() > 0 then
         for i = 1, GetNumPartyMembers() do
             local unit = "party" .. i
             local name = UnitName(unit)
 
-            -- Check if the member is dead and exists, but also ensure it's not the player
             if UnitIsDead(unit) and not UnitIsGhost(unit) and name ~= playerName then
                 UninviteMember(name, "dead")
             end
@@ -158,9 +163,9 @@ local function SavePartyMembersAndSetFirstBot()
   end
 
   if firstBotName then
-      QueueMessage("First bot set to: " .. firstBotName, "none")
+      QueueMessage("First bot set to: " .. firstBotName, "debug")
   else
-      QueueMessage("Error: No bot found to set as the first bot.", "none")
+      QueueMessage("Error: No bot found to set as the first bot.", "debug")
   end
 end
 
@@ -172,7 +177,7 @@ function resetfirstbot_OnEvent()
             initialBotRemoved = false
             firstBotName = nil
 			botCount = 0
-            --QueueMessage("Bot state reset: No members in party or raid.", "none")
+            QueueMessage("Bot state reset: No members in party or raid.", "debug")
         end
     end
 end
@@ -195,7 +200,7 @@ end
 -- Initialize the frame for OnUpdate
 local updateFrame = CreateFrame("Frame")
 updateFrame:SetScript("OnUpdate", OnUpdate)
-nextUpdateTime = GetTime() -- Initialize the next update time
+nextUpdateTime = GetTime() 
 
 function FillRaid_OnLoad()
   this:RegisterEvent("PLAYER_LOGIN")
@@ -204,7 +209,7 @@ function FillRaid_OnLoad()
   this:RegisterEvent('GROUP_ROSTER_UPDATE')
   this:RegisterEvent("ADDON_LOADED")
   this:RegisterEvent("CHAT_MSG_SYSTEM")
-  QueueMessage("FillRaid |cff00FF00 loaded|cffffffff", "none")
+  QueueMessage("FillRaid 1.0.0 |cff00FF00 loaded|cffffffff", "none")
 end
 
 local function FillRaid()
@@ -233,9 +238,9 @@ local function FillRaid()
       -- In a party but not a raid; convert to raid if there are 2 or more players
       if GetNumPartyMembers() >= 1 then -- Includes yourself
           ConvertToRaid()
-          --QueueMessage("Converted to raid.", "none")
+          QueueMessage("Converted to raid.", "debug")
       else
-          --QueueMessage("You need at least 2 players in the group to convert to a raid.", "none")
+          QueueMessage("You need at least 2 players in the group to convert to a raid.", "debug")
           return
       end
   end
@@ -254,7 +259,7 @@ end
 -- Create the UI frame for class selection and the Fill Raid button
 function CreateFillRaidUI()
     -- Create the main UI frame
-    FillRaidFrame = CreateFrame("Frame", "FillRaidFrame", UIParent) -- Assign global reference
+    FillRaidFrame = CreateFrame("Frame", "FillRaidFrame", UIParent) 
     FillRaidFrame:SetWidth(310)
     FillRaidFrame:SetHeight(450)
     FillRaidFrame:SetPoint("CENTER", UIParent, "CENTER")
@@ -263,7 +268,7 @@ function CreateFillRaidUI()
     FillRaidFrame:RegisterForDrag("LeftButton")
     FillRaidFrame:SetScript("OnDragStart", FillRaidFrame.StartMoving)
     FillRaidFrame:SetScript("OnDragStop", FillRaidFrame.StopMovingOrSizing)
-    -- Handle custom dragging
+
     FillRaidFrame:SetScript("OnMouseDown", function()
         if arg1 == "LeftButton" and not this.isMoving then
             this:StartMoving()
@@ -283,7 +288,7 @@ function CreateFillRaidUI()
         tile = true, tileSize = 16, edgeSize = 16,
         insets = { left = 4, right = 4, top = 4, bottom = 4 }
     })
-    FillRaidFrame:SetBackdropColor(0, 0, 0, 1) -- Black background
+    FillRaidFrame:SetBackdropColor(0, 0, 0, 1) 
 
 
 	-- Add header background texture to FillRaidFrame
@@ -302,7 +307,7 @@ function CreateFillRaidUI()
 
     local yOffset = -30
     local xOffset = 20
-    local totalBots = 0 -- To keep track of the total number of bots
+    local totalBots = 0 
 
     -- Label to display the total number of bots
     local totalBotLabel = FillRaidFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
@@ -434,8 +439,8 @@ function CreateFillRaidUI()
 	  fillRaidButton:SetText("Fill Raid")
 
 	  fillRaidButton:SetScript("OnClick", function()
-		  FillRaid()  -- Call your existing FillRaid function
-		  FillRaidFrame:Hide()  -- Hide the FillRaidFrame after filling the raid
+		  FillRaid()  
+		  FillRaidFrame:Hide()  
 	  end)
 
 
@@ -447,7 +452,7 @@ function CreateFillRaidUI()
 	  closeButton:SetText("Close")
 	  closeButton:SetScript("OnClick", function()
 		  FillRaidFrame:Hide()
-		  fillRaidFrameManualClose = true -- Mark as manually closed
+		  fillRaidFrameManualClose = true 
 	  end)
 	  
 	local UISettingsFrame = CreateFrame("Frame", "UISettingsFrame", UIParent)
@@ -460,23 +465,23 @@ function CreateFillRaidUI()
 		tile = true, tileSize = 16, edgeSize = 16,
 		insets = { left = 4, right = 4, top = 4, bottom = 4 }
 	})
-	UISettingsFrame:SetBackdropColor(0, 0, 0, 1) -- Black background
+	UISettingsFrame:SetBackdropColor(0, 0, 0, 1) 
 	UISettingsFrame:SetFrameStrata("DIALOG")
 	UISettingsFrame:SetFrameLevel(10)
-	UISettingsFrame:Hide() -- Initially hidden
+	UISettingsFrame:Hide() 
 
 	local openSettingsButton = CreateFrame("Button", "OpenSettingsButton", FillRaidFrame, "GameMenuButtonTemplate")
 	openSettingsButton:SetWidth(80)
 	openSettingsButton:SetHeight(20)
 	openSettingsButton:SetText("Settings")
-	openSettingsButton:SetPoint("TOPLEFT", FillRaidFrame, "TOPLEFT", 10, -10) -- Adjusted to TOPLEFT
+	openSettingsButton:SetPoint("TOPLEFT", FillRaidFrame, "TOPLEFT", 10, -10) 
 	openSettingsButton:SetScript("OnClick", function()
 		if UISettingsFrame:IsShown() then
 			UISettingsFrame:Hide()
-			ClickBlockerFrame:Hide() -- Hide the blocker when the frame is hidden
+			ClickBlockerFrame:Hide() 
 		else
 			UISettingsFrame:Show()
-			ClickBlockerFrame:Show() -- Show the blocker when the frame is open
+			ClickBlockerFrame:Show()
 		end
 	end)
 
@@ -492,10 +497,10 @@ function CreateFillRaidUI()
         tile = true, tileSize = 16, edgeSize = 16,
         insets = { left = 4, right = 4, top = 4, bottom = 4 }
     })
-    InstanceButtonsFrame:SetBackdropColor(0, 0, 0, 1) -- Black background
+    InstanceButtonsFrame:SetBackdropColor(0, 0, 0, 1) 
     InstanceButtonsFrame:SetFrameStrata("DIALOG")
     InstanceButtonsFrame:SetFrameLevel(10)
-    InstanceButtonsFrame:Hide() -- Initially hidden
+    InstanceButtonsFrame:Hide()
 
     local instanceButtons = {}
     local function CreateInstanceButton(label, yOffset, frameName)
@@ -548,10 +553,10 @@ local function CreateInstanceFrame(name, presets)
         tile = true, tileSize = 16, edgeSize = 16,
         insets = { left = 4, right = 4, top = 4, bottom = 4 }
     })
-    frame:SetBackdropColor(0, 0, 0, 1) -- Black background
+    frame:SetBackdropColor(0, 0, 0, 1) 
     frame:SetFrameStrata("DIALOG")
     frame:SetFrameLevel(10)
-    frame:Hide() -- Initially hidden
+    frame:Hide() 
 
     local buttonWidth = 80
     local buttonHeight = 30
@@ -563,16 +568,14 @@ local function CreateInstanceFrame(name, presets)
     local totalButtonHeight = buttonHeight + padding
     local numButtons = table.getn(presets)
     local numColumns = math.ceil(numButtons / maxButtonsPerColumn)
-
-    -- Set fixed vertical starting position for the first button
-    local fixedStartY = -10 -- Adjust this value to your desired starting position
+    local fixedStartY = -10 
 
     -- Function to create preset buttons
     local function CreatePresetButton(preset, index)
         local button = CreateFrame("Button", nil, frame, "GameMenuButtonTemplate")
         button:SetWidth(buttonWidth)
         button:SetHeight(buttonHeight)
-        button:SetText(preset.label or "Unknown preset") -- Default text if label is nil
+        button:SetText(preset.label or "Unknown preset") 
 
         -- Calculate column and row based on index
         local column = math.floor((index - 1) / maxButtonsPerColumn)
@@ -589,7 +592,7 @@ local function CreateInstanceFrame(name, presets)
                     inputBox:SetNumber(0)
                     local onTextChanged = inputBox:GetScript("OnTextChanged")
                     if onTextChanged then
-                        onTextChanged(inputBox) -- Trigger the OnTextChanged handler to update totals
+                        onTextChanged(inputBox) 
                     end
                 end
             end
@@ -602,7 +605,7 @@ local function CreateInstanceFrame(name, presets)
                         inputBox:SetNumber(value)
                         local onTextChanged = inputBox:GetScript("OnTextChanged")
                         if onTextChanged then
-                            onTextChanged(inputBox) -- Trigger the OnTextChanged handler to update totals
+                            onTextChanged(inputBox) 
                         end
                     end
                 end
@@ -658,7 +661,7 @@ end
             ClickBlockerFrame:Hide()
         else
             InstanceButtonsFrame:Show()
-            ClickBlockerFrame:Show() -- Show the blocker when InstanceButtonsFrame is open
+            ClickBlockerFrame:Show() 
         end
     end)
 	
@@ -671,14 +674,12 @@ resetButton:SetPoint("TOPRIGHT", FillRaidFrame, "TOPRIGHT", -10, -30)
 resetButton:SetWidth(80)
 resetButton:SetHeight(20)
 resetButton:SetText("Reset")
-
--- Add functionality to reset all input boxes
 resetButton:SetScript("OnClick", function()
     for _, inputBox in pairs(inputBoxes) do
-        inputBox:SetNumber(0) -- Reset to 0
+        inputBox:SetNumber(0) 
         local onTextChanged = inputBox:GetScript("OnTextChanged")
         if onTextChanged then
-            onTextChanged(inputBox) -- Trigger the OnTextChanged handler to update totals
+            onTextChanged(inputBox) 
         end
     end
 
@@ -697,17 +698,16 @@ ClickBlockerFrame:EnableMouse(true) -- Captures mouse clicks
 ClickBlockerFrame:SetFrameStrata("DIALOG") -- Same strata as PresetFrame
 ClickBlockerFrame:SetFrameLevel(1) -- Below PresetFrame
 ClickBlockerFrame:SetScript("OnMouseDown", function()
-    ClickBlockerFrame:Hide() -- Hide the blocker
-    InstanceButtonsFrame:Hide() -- Hide the PresetFrame
+    ClickBlockerFrame:Hide() 
+    InstanceButtonsFrame:Hide() 
 	UISettingsFrame:Hide()
-    -- Hide all instance frames
     for frameName, frame in pairs(instanceFrames) do
         if frame:IsShown() then
             frame:Hide()
         end
     end
 end)
-ClickBlockerFrame:Hide() -- Initially hidden
+ClickBlockerFrame:Hide() 
 
 
 	-- Create the "Open FillRaid" button
@@ -735,7 +735,7 @@ ClickBlockerFrame:Hide() -- Initially hidden
 		end
 	end)
 
-	openFillRaidButton:Hide() -- Hide the button initially
+	openFillRaidButton:Hide() 
 
 	-- Create the "Kick All" button below OpenFillRaidButton
 	local kickAllButton = CreateFrame("Button", "KickAllButton", UIParent, "GameMenuButtonTemplate")
@@ -745,10 +745,9 @@ ClickBlockerFrame:Hide() -- Initially hidden
 	SetVerticalText(kickAllButton, "KICK ALL")
 
 	kickAllButton:SetScript("OnClick", function()
-		UninviteAllRaidMembers()  -- Call the function to uninvite all raid members
+		UninviteAllRaidMembers()  
 	end)
-
-	kickAllButton:Hide() -- Hide the button initially
+	kickAllButton:Hide() 
 
 	-- Function to update the position of the openFillRaidButton and kickAllButton relative to PCPFrame
 	local function UpdateButtonPosition()
@@ -802,24 +801,23 @@ local messageCooldowns = {}
 
 -- Function to check if the message should be shown based on cooldown
 local function shouldShowMessage(message)
-    local currentTime = GetTime() -- Get the current time
+    local currentTime = GetTime() 
     for pattern, cooldown in pairs(messagesToHide) do
         if string.find(message, pattern) then
-            -- If the message should always be hidden (cooldown == 0)
             if cooldown == 0 then
-                return false -- Always hide this message
+                return false 
             end
 
             local lastShown = messageCooldowns[pattern] or 0
             if currentTime - lastShown >= cooldown then
-                messageCooldowns[pattern] = currentTime -- Update the last shown time
-                return true -- Allow the message to be shown
+                messageCooldowns[pattern] = currentTime 
+                return true
             else
-                return false -- Hide the message
+                return false 
             end
         end
     end
-    return true -- Allow all other messages
+    return true
 end
 
 -- Hook the default chat frame's AddMessage function
@@ -862,6 +860,6 @@ function UninviteAllRaidMembers()
 end
 
 
--- Create a slash command to trigger the function
+
 SLASH_UNINVITE1 = "/uninviteraid"
 SlashCmdList["UNINVITE"] = UninviteAllRaidMembers
