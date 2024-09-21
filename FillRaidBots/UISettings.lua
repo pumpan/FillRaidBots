@@ -35,7 +35,10 @@ local function CreateToggleCheckButton()
     checkButton:SetWidth(30)
     checkButton:SetHeight(30)
     checkButton:SetPoint("TOPLEFT", UISettingsFrame, "TOPLEFT", 10, -10)
-    checkButton.text = _G[checkButton:GetName() .. "Text"]
+
+    -- Create a text label for the button
+    checkButton.text = checkButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    checkButton.text:SetPoint("LEFT", checkButton, "RIGHT", 5, 0)
     checkButton.text:SetText("Auto Remove Dead Bots")
 
     checkButton:SetChecked(FillRaidBotsSavedSettings.isCheckAndRemoveEnabled)
@@ -64,7 +67,9 @@ local function CreateToggleCheckButton()
     botMessagesCheckButton:SetWidth(30)
     botMessagesCheckButton:SetHeight(30)
     botMessagesCheckButton:SetPoint("TOPLEFT", UISettingsFrame, "TOPLEFT", 10, -50)
-    botMessagesCheckButton.text = _G[botMessagesCheckButton:GetName() .. "Text"]
+
+    botMessagesCheckButton.text = botMessagesCheckButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    botMessagesCheckButton.text:SetPoint("LEFT", botMessagesCheckButton, "RIGHT", 5, 0)
     botMessagesCheckButton.text:SetText("Suppress Messages")
 
     botMessagesCheckButton:SetChecked(FillRaidBotsSavedSettings.isBotMessagesEnabled)
@@ -87,7 +92,9 @@ local function CreateToggleCheckButton()
     debugMessagesCheckButton:SetWidth(30)
     debugMessagesCheckButton:SetHeight(30)
     debugMessagesCheckButton:SetPoint("TOPLEFT", UISettingsFrame, "TOPLEFT", 10, -90)
-    debugMessagesCheckButton.text = _G[debugMessagesCheckButton:GetName() .. "Text"]
+
+    debugMessagesCheckButton.text = debugMessagesCheckButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    debugMessagesCheckButton.text:SetPoint("LEFT", debugMessagesCheckButton, "RIGHT", 5, 0)
     debugMessagesCheckButton.text:SetText("Enable Debug")
 
     debugMessagesCheckButton:SetChecked(FillRaidBotsSavedSettings.debugMessagesEnabled)
@@ -105,6 +112,7 @@ local function CreateToggleCheckButton()
         GameTooltip:Hide()
     end)
 end
+
 
 
 -- Load settings function
