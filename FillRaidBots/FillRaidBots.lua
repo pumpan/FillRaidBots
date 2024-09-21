@@ -36,13 +36,7 @@ if FillRaidBotsSavedSettings == nil then
     FillRaidBotsSavedSettings = {}
 end
 
--- Initialize the saved setting for the toggle button
-local function InitializeSettings()
-    -- Initialize the setting for isCheckAndRemoveEnabled if not already set
-    if FillRaidBotsSavedSettings.isCheckAndRemoveEnabled == nil then
-        FillRaidBotsSavedSettings.isCheckAndRemoveEnabled = false  -- Default to false
-    end
-end
+
 
 -- Add messages to the queue
 local function QueueMessage(message, recipient, incrementBotCount)
@@ -793,7 +787,7 @@ end
 
 -- Call the function to create the UI when the addon is loaded
 CreateFillRaidUI()
-InitializeSettings()
+
 
 
 -- Table to keep track of the last time a message was shown
