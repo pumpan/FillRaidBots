@@ -105,6 +105,13 @@ local function CheckAndRemoveDeadBots()
     if not FillRaidBotsSavedSettings.isCheckAndRemoveEnabled then return end
     local playerName = UnitName("player")
 
+
+-- Check if we are in a raid and not the raid leader or officer
+	if not (IsRaidLeader() or IsRaidOfficer()) and GetNumRaidMembers() > 0 then
+		QueueMessage("You must be a raid leader or officer to remove bots.", "debug")
+		return
+	end
+
     if GetNumRaidMembers() > 0 then
         -- Ensure raid has at least 2 members before removing anyone
         if GetNumRaidMembers() > 2 then
@@ -135,6 +142,33 @@ local function CheckAndRemoveDeadBots()
 end
 
 
+
+
+local function SaveRaidMembersAndSetFirstBot()
+    local raidMembers = {}
+    local playerName = UnitName("player") -- Get the player's name
+    firstBotName = nil  -- Initialize firstBotName as nil at the start
+    
+    for i = 1, GetNumRaidMembers() do
+        local unit = "raid" .. i
+        local name = UnitName(unit)
+
+        -- Only add the member if it is not the player
+        if name and name ~= playerName then
+            table.insert(raidMembers, name)
+            -- Set firstBotName only if it hasn't been set yet
+            if not firstBotName then
+                firstBotName = name
+            end
+        end
+    end
+    -- Check if firstBotName was set and output appropriate message
+    if firstBotName then
+        QueueMessage("First bot in raid set to: " .. firstBotName, "debug")
+    else
+        QueueMessage("Error: No bot found to set as the first bot in raid.", "debug")
+    end
+end
 
 -- Function to save party member names and set the first bot's name
 local function SavePartyMembersAndSetFirstBot()
@@ -207,48 +241,56 @@ function FillRaid_OnLoad()
 end
 
 local function FillRaid()
-  -- Check if we are in a party
-  if GetNumPartyMembers() == 0 then
-      -- Not in a party; add the first bot to create the party
-      QueueMessage(".partybot add warrior tank", "SAY", true)
-      QueueMessage("Inviting the first bot to start the party.", "none")
+    -- Check if we are already in a raid
+    if GetNumRaidMembers() > 0 then
+        -- We are already in a raid
+        if GetNumRaidMembers() == 2 then
+            SaveRaidMembersAndSetFirstBot() -- Save the bot if we're exactly 2 raid members (player + bot)
+            QueueMessage("SaveRaidMembersAndSetFirstBot called", "debug")
+        end
+    else
+        -- We are not in a raid, check if we are in a party
+        if GetNumPartyMembers() == 0 then
+            -- Not in a party; add the first bot to create the party
+            QueueMessage(".partybot add warrior tank", "SAY", true)
+            QueueMessage("Inviting the first bot to start the party.", "none")
 
-      -- Create a frame to wait until the party is created, then continue filling
-      local waitForPartyFrame = CreateFrame("Frame")
-      waitForPartyFrame:SetScript("OnUpdate", function()
-          if GetNumPartyMembers() > 0 then
-              this:SetScript("OnUpdate", nil)
-              this:Hide()
-              SavePartyMembersAndSetFirstBot() -- Save party members and set the first bot
-              FillRaid() -- Retry filling the raid now that the party is created
-          end
-      end)
-      waitForPartyFrame:Show()
-      return -- Exit temporarily to wait until the bot is added and the group is created
-  end
+            -- Create a frame to wait until the party is created, then continue filling
+            local waitForPartyFrame = CreateFrame("Frame")
+            waitForPartyFrame:SetScript("OnUpdate", function()
+                if GetNumPartyMembers() > 0 then
+                    this:SetScript("OnUpdate", nil)
+                    this:Hide()
+                    SavePartyMembersAndSetFirstBot() -- Save party members and set the first bot
+                    FillRaid() -- Retry filling the raid now that the party is created
+                end
+            end)
+            waitForPartyFrame:Show()
+            return -- Exit temporarily to wait until the bot is added and the group is created
+        end
 
-  -- Check if we are in a raid
-  if GetNumRaidMembers() == 0 then
-      -- In a party but not a raid; convert to raid if there are 2 or more players
-      if GetNumPartyMembers() >= 1 then -- Includes yourself
-          ConvertToRaid()
-          QueueMessage("Converted to raid.", "debug")
-      else
-          QueueMessage("You need at least 2 players in the group to convert to a raid.", "debug")
-          return
-      end
-  end
+        -- If we are in a party but not yet in a raid
+        if GetNumPartyMembers() >= 1 then
+            -- Convert to raid if there are 2 or more players
+            ConvertToRaid()
+            QueueMessage("Converted to raid.", "debug")
+        elseif GetNumPartyMembers() < 2 then
+            QueueMessage("You need at least 2 players in the group to convert to a raid.", "debug")
+            return
+        end
+    end
 
-  -- Now fill the raid based on the selected class counts
-  for _, class in ipairs(classes) do
-      local count = classCounts[class] or 0
-      for i = 1, count do
-          QueueMessage(".partybot add " .. class, "SAY", true)
-      end
-  end
+    -- Now fill the raid based on the selected class counts
+    for _, class in ipairs(classes) do
+        local count = classCounts[class] or 0
+        for i = 1, count do
+            QueueMessage(".partybot add " .. class, "SAY", true)
+        end
+    end
 
-  QueueMessage("Raid filling complete.", "none")
+    QueueMessage("Raid filling complete.", "none")
 end
+
 
 -- Create the UI frame for class selection and the Fill Raid button
 function CreateFillRaidUI()
@@ -518,7 +560,7 @@ function CreateFillRaidUI()
             if frame then
                 frame:Show()
             else
-                print("Error: Frame '" .. frameName .. "' not found.")
+                QueueMessage("Error: Frame '" .. frameName .. "' not found.", "debug")
             end
         end)
         return button

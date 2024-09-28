@@ -128,8 +128,7 @@ function FillRaidBots_LoadSettings()
     if FillRaidBotsSavedSettings.isCheckAndRemoveEnabled == nil then
         FillRaidBotsSavedSettings.isCheckAndRemoveEnabled = true -- Default to enabled
         DEFAULT_CHAT_FRAME:AddMessage("Defaulting CheckAndRemove to enabled") -- Debug message
-    else
-        DEFAULT_CHAT_FRAME:AddMessage("CheckAndRemove loaded as: " .. tostring(FillRaidBotsSavedSettings.isCheckAndRemoveEnabled)) -- Debug message
+
     end
 
     if FillRaidBotsSavedSettings.isBotMessagesEnabled == nil then
