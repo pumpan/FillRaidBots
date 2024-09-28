@@ -237,7 +237,7 @@ function FillRaid_OnLoad()
   this:RegisterEvent('GROUP_ROSTER_UPDATE')
   this:RegisterEvent("ADDON_LOADED")
   this:RegisterEvent("CHAT_MSG_SYSTEM")
-  QueueMessage("FillRaid 1.0.0 |cff00FF00 loaded|cffffffff", "none")
+  QueueMessage("FillRaid 1.1.0 |cff00FF00 loaded|cffffffff", "none")
 end
 
 local function FillRaid()
