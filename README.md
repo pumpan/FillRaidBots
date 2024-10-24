@@ -66,7 +66,24 @@ The addon includes optimized presets for several dungeons and raids:
 - **SuppressBotMsg.lua** edit this file to add or change how often a message should be displayed
 - **Presets.lua** edit this file to add or change a preset
 
+## Changelog
+Fillraidbots 1.2.0
 
+    🛠 Fixed: Since the latest server update, which prevents adding bots while in combat, an issue occurred where adding certain bots, such as warriors or hunters, caused you to enter combat for a few seconds. This created a problem where the addon attempted to add bots when they couldn't be added. I have now fixed it so that the addon detects when you're in combat and pauses until you're out of combat.
+
+    🛠 Added: The ability to move the 'fill raid' and 'kick all' buttons if this is enabled in the settings."
+
+    🛠 Added: A version number to the FillRaidFrame so that it's easier to see which version you're using.
+
+    🔄 Version updated: Incremented from 1.1.0 to 1.2.0 to reflect both the addition of new features (movable buttons and visible version number) and the resolution of a bug related to combat behavior. This update introduces functional improvements while maintaining backward compatibility.
+
+Fillraidbots 1.1.0
+
+    🛠 Added: : Checks if you are in a raid and there is still 1 old bot remaining. Removes the old bot when there are 10 new bots in the raid.
+
+    🛠 Added: : If you are playing with someone else and are not the leader or an officer, the "remove bot" function is disabled.
+
+    🔄 Version updated: From 1.0.0 to 1.1.0, indicating bug fixes.
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
