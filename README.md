@@ -7,7 +7,8 @@ This addon is an extension for the **PartyBot Command Panel (PCP)** for **World 
 ## Features
 
 - **Automated Interface Creation:**
-  - Automatically creates and opens the "Fill Raid" and "Kick All" buttons when the PartyBot Command Panel is accessed.
+   Automatically creates and opens the "Fill Raid" and "Kick All" buttons when the PartyBot Command Panel is accessed.
+  
 ![Configuration Frame](ScreenShots/fillraidbots.png)
 ![Configuration Frame](ScreenShots/fillraidbots7.png)
 - **Fill Raid Button:**
