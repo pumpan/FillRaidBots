@@ -5,6 +5,7 @@
             <OnLoad>
                 FillRaid_OnLoad(self);
                 resetfirstbot_OnEvent(self, event);
+
             </OnLoad>
         </Scripts>
     </Frame>

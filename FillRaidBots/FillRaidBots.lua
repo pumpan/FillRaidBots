@@ -18,7 +18,7 @@ local classes = {
   "druid meleedps",
   "druid rangedps"
 }
-
+local versionNumber = "v1.2.0"
 local botCount = 0
 local initialBotRemoved = false
 local firstBotName = nil
@@ -27,8 +27,8 @@ local delay = 0.5 -- Delay between messages
 local nextUpdateTime = 0 -- Initialize the next update time
 
 local classCounts = {}
-local FillRaidFrame -- Declare global reference for your frame
-local fillRaidFrameManualClose = false -- State variable to track manual close
+local FillRaidFrame 
+local fillRaidFrameManualClose = false 
 local isCheckAndRemoveEnabled = false
 
 
@@ -37,19 +37,76 @@ if FillRaidBotsSavedSettings == nil then
 end
 
 
+-- Frame for combat checking and retry mechanism
+local combatCheckFrame = CreateFrame("Frame")
+combatCheckFrame:SetScript("OnUpdate", nil) 
 
--- Add messages to the queue
-local function QueueMessage(message, recipient, incrementBotCount)
-  table.insert(messageQueue,
-      { message = message, recipient = recipient or "none", incrementBotCount = incrementBotCount or false })
+local messageQueue = {} 
+local botCount = 0
+local initialBotRemoved = false
+local firstBotName = nil 
+local isInCombat = false
+local retryTimerRunning = false
+local lastTimeChecked = 0
+local checkInterval = 1 -- Time in seconds to recheck combat status
+local incombatmessagesent = false
+-- Function to check if any raid member is in combat
+local function IsAnyRaidMemberInCombat()
+    if GetNumRaidMembers() > 0 then
+        for i = 1, GetNumRaidMembers() do
+            if UnitAffectingCombat("raid"..i) then
+                return true -- A raid member is in combat
+            end
+        end
+    end
+    return false 
+end
+
+-- Function to retry message queue processing after combat ends
+function RetryMessageQueueProcessing()
+    local currentTime = GetTime()
+    
+    if currentTime - lastTimeChecked >= checkInterval then
+        lastTimeChecked = currentTime 
+
+        if not IsAnyRaidMemberInCombat() then
+            print("Resuming..")
+            isInCombat = false
+            retryTimerRunning = false
+			incombatmessagesent = false	
+            combatCheckFrame:SetScript("OnUpdate", nil) 
+            ProcessMessageQueue() -- Resume queue processing
+        else
+            --print("Still in combat, retrying...")
+        end
+    end
 end
 
 -- Function to process and send chat messages from the queue
-local function ProcessMessageQueue()
-    if next(messageQueue) ~= nil then -- Check if the queue is not empty
+function ProcessMessageQueue()
+    if next(messageQueue) ~= nil then 
         local messageInfo = table.remove(messageQueue, 1)
         local message = messageInfo.message
         local recipient = messageInfo.recipient
+
+        -- Only check for combat if the recipient is "SAY"
+        if recipient == "SAY" then
+            -- Check if someone is in combat
+            if IsAnyRaidMemberInCombat() then
+				if not incombatmessagesent then 
+					print("Raid member in combat, waiting..")
+					incombatmessagesent = true	
+				end	
+                isInCombat = true
+                if not retryTimerRunning then
+                    combatCheckFrame:SetScript("OnUpdate", RetryMessageQueueProcessing)
+                    retryTimerRunning = true
+                end
+                -- Reinsert the current message back into the queue since it wasn’t sent
+                table.insert(messageQueue, 1, messageInfo)
+                return -- Exit early to pause the queue until combat ends
+            end
+        end
 
         -- Handle debug messages: only display if debug mode is enabled
         if recipient == "debug" then
@@ -67,9 +124,10 @@ local function ProcessMessageQueue()
             SendChatMessage(message, recipient)
         end
 
+        -- Handle bot count increment
         if messageInfo.incrementBotCount then
             botCount = botCount + 1
-            -- Remove the first bot after the 10 bot is added
+            -- Remove the first bot after the 10th bot is added
             if botCount == 10 and not initialBotRemoved then
                 if firstBotName then
                     UninviteMember(firstBotName, "firstBotRemoved")
@@ -81,6 +139,15 @@ local function ProcessMessageQueue()
         end
     end
 end
+
+-- Function to add a message to the queue
+local function QueueMessage(message, recipient, incrementBotCount)
+    table.insert(messageQueue,
+        { message = message, recipient = recipient or "none", incrementBotCount = incrementBotCount or false })
+end
+
+
+
 
 
 -- Function to uninvite a specific member by their name
@@ -124,7 +191,7 @@ local function CheckAndRemoveDeadBots()
                     UninviteMember(name, "dead")
                 end
             end
-            messagecantremove = false -- Reset the flag if removal is possible
+            messagecantremove = false 
         elseif not messagecantremove then
             QueueMessage("Saving the last bot so the raid does not disband.", "debug")
             messagecantremove = true
@@ -142,12 +209,10 @@ local function CheckAndRemoveDeadBots()
 end
 
 
-
-
 local function SaveRaidMembersAndSetFirstBot()
     local raidMembers = {}
     local playerName = UnitName("player") -- Get the player's name
-    firstBotName = nil  -- Initialize firstBotName as nil at the start
+    firstBotName = nil  
     
     for i = 1, GetNumRaidMembers() do
         local unit = "raid" .. i
@@ -156,7 +221,6 @@ local function SaveRaidMembersAndSetFirstBot()
         -- Only add the member if it is not the player
         if name and name ~= playerName then
             table.insert(raidMembers, name)
-            -- Set firstBotName only if it hasn't been set yet
             if not firstBotName then
                 firstBotName = name
             end
@@ -200,7 +264,6 @@ end
 
 function resetfirstbot_OnEvent()
     if event == "RAID_ROSTER_UPDATE" or event == "PARTY_MEMBERS_CHANGED" then
-        -- Check if there are no party or raid members
         if GetNumPartyMembers() == 0 and GetNumRaidMembers() == 0 then
             initialBotRemoved = false
             firstBotName = nil
@@ -216,16 +279,16 @@ resetBotFrame:RegisterEvent("RAID_ROSTER_UPDATE")
 resetBotFrame:RegisterEvent("PARTY_MEMBERS_CHANGED")
 resetBotFrame:SetScript("OnEvent", resetfirstbot_OnEvent)
 
+
 -- Function to handle the delayed sending of messages and notifications
 local function OnUpdate()
   if GetTime() >= nextUpdateTime then
       ProcessMessageQueue()
-      CheckAndRemoveDeadBots() -- Check for dead bots regularly
-      nextUpdateTime = GetTime() + delay -- Set the next update time
+	  CheckAndRemoveDeadBots() 
+      nextUpdateTime = GetTime() + delay 
   end
 end
 
--- Initialize the frame for OnUpdate
 local updateFrame = CreateFrame("Frame")
 updateFrame:SetScript("OnUpdate", OnUpdate)
 nextUpdateTime = GetTime() 
@@ -237,13 +300,12 @@ function FillRaid_OnLoad()
   this:RegisterEvent('GROUP_ROSTER_UPDATE')
   this:RegisterEvent("ADDON_LOADED")
   this:RegisterEvent("CHAT_MSG_SYSTEM")
-  QueueMessage("FillRaid 1.1.0 |cff00FF00 loaded|cffffffff", "none")
+  QueueMessage("FillRaid [" .. versionNumber .. "]|cff00FF00 loaded|cffffffff", "none")
 end
 
 local function FillRaid()
     -- Check if we are already in a raid
     if GetNumRaidMembers() > 0 then
-        -- We are already in a raid
         if GetNumRaidMembers() == 2 then
             SaveRaidMembersAndSetFirstBot() -- Save the bot if we're exactly 2 raid members (player + bot)
             QueueMessage("SaveRaidMembersAndSetFirstBot called", "debug")
@@ -251,7 +313,6 @@ local function FillRaid()
     else
         -- We are not in a raid, check if we are in a party
         if GetNumPartyMembers() == 0 then
-            -- Not in a party; add the first bot to create the party
             QueueMessage(".partybot add warrior tank", "SAY", true)
             QueueMessage("Inviting the first bot to start the party.", "none")
 
@@ -266,7 +327,7 @@ local function FillRaid()
                 end
             end)
             waitForPartyFrame:Show()
-            return -- Exit temporarily to wait until the bot is added and the group is created
+            return 
         end
 
         -- If we are in a party but not yet in a raid
@@ -292,9 +353,8 @@ local function FillRaid()
 end
 
 
--- Create the UI frame for class selection and the Fill Raid button
+-- UI frame for class selection and the Fill Raid button
 function CreateFillRaidUI()
-    -- Create the main UI frame
     FillRaidFrame = CreateFrame("Frame", "FillRaidFrame", UIParent) 
     FillRaidFrame:SetWidth(310)
     FillRaidFrame:SetHeight(450)
@@ -326,8 +386,10 @@ function CreateFillRaidUI()
     })
     FillRaidFrame:SetBackdropColor(0, 0, 0, 1) 
 
+    local versionText = FillRaidFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    versionText:SetPoint("BOTTOMRIGHT", FillRaidFrame, "BOTTOMRIGHT", -10, 10)  -- Adjust offset as needed
+    versionText:SetText(versionNumber)
 
-	-- Add header background texture to FillRaidFrame
 	FillRaidFrame.header = FillRaidFrame:CreateTexture(nil, 'ARTWORK')
 	FillRaidFrame.header:SetWidth(250)
 	FillRaidFrame.header:SetHeight(64)
@@ -335,7 +397,6 @@ function CreateFillRaidUI()
 	FillRaidFrame.header:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Header")
 	FillRaidFrame.header:SetVertexColor(.2, .2, .2)
 
-	-- Add header text to FillRaidFrame
 	FillRaidFrame.headerText = FillRaidFrame:CreateFontString(nil, 'ARTWORK', 'GameFontNormal')
 	FillRaidFrame.headerText:SetPoint('TOP', FillRaidFrame.header, 0, -14)
 	FillRaidFrame.headerText:SetText('Fill Raid')
@@ -364,13 +425,11 @@ function CreateFillRaidUI()
     roleCountsLabel:SetText("Tanks: 0 Healers: 0 Melee DPS: 0 Ranged DPS: 0")
     yOffset = yOffset - 30
 
-    -- Number of columns and rows
     local columns = 2
     local rowsPerColumn = 9
     local columnWidth = 150
     local rowHeight = 30
 
-    -- Define role-based icons using built-in paths
     local roleIcons = {
         ["tank"] = "Interface\\Icons\\Ability_Defend",
         ["meleedps"] = "Interface\\Icons\\Ability_DualWield",
@@ -378,8 +437,6 @@ function CreateFillRaidUI()
         ["healer"] = "Interface\\Icons\\Spell_Holy_Heal",
     }
 
-
-    -- Initialize role counts
     local roleCounts = {
         ["tank"] = 0,
         ["healer"] = 0,
@@ -387,7 +444,6 @@ function CreateFillRaidUI()
         ["rangedps"] = 0,
     }
 
-    -- Table to store input box references
     local inputBoxes = {}
 
     -- Function to split class and role using string.find
@@ -401,7 +457,7 @@ function CreateFillRaidUI()
         return classRole, nil
     end
 
-    -- Create input boxes for each class with role
+    -- input boxes for each class with role
     for i, classRole in ipairs(classes) do
         local class, role = SplitClassRole(classRole)
 
@@ -429,7 +485,6 @@ function CreateFillRaidUI()
         classInput:SetNumeric(true)
         classInput:SetNumber(0)
 
-        -- Store reference in the table
         inputBoxes[classRole] = classInput
 
         local className = classRole
@@ -467,7 +522,7 @@ function CreateFillRaidUI()
         end)
     end
 
-	  -- Create the Fill Raid button
+
 	  local fillRaidButton = CreateFrame("Button", nil, FillRaidFrame, "GameMenuButtonTemplate")
 	  fillRaidButton:SetPoint("BOTTOM", FillRaidFrame, "BOTTOM", -60, 20)
 	  fillRaidButton:SetWidth(120)
@@ -480,7 +535,7 @@ function CreateFillRaidUI()
 	  end)
 
 
-	  -- Create the Close button
+
 	  local closeButton = CreateFrame("Button", nil, FillRaidFrame, "GameMenuButtonTemplate")
 	  closeButton:SetPoint("BOTTOM", FillRaidFrame, "BOTTOM", 60, 20)
 	  closeButton:SetWidth(120)
@@ -522,7 +577,7 @@ function CreateFillRaidUI()
 	end)
 
 
-    -- Create the Instance Buttons Frame
+    -- Instance Buttons Frame
     local InstanceButtonsFrame = CreateFrame("Frame", "InstanceButtonsFrame", UIParent)
     InstanceButtonsFrame:SetWidth(200)
     InstanceButtonsFrame:SetHeight(350)
@@ -577,7 +632,7 @@ function CreateFillRaidUI()
 	CreateInstanceButton("Other", -290, "PresetDungeounOther")
 
 
-    -- Function to create instance frames with error checking
+    -- create instance frames with error checking
 local function CreateInstanceFrame(name, presets)
     local frame = CreateFrame("Frame", name, UIParent)
     frame:SetWidth(200)
@@ -599,7 +654,7 @@ local function CreateInstanceFrame(name, presets)
     local padding = 10
     local maxButtonsPerColumn = 8
 
-    -- Calculate total width and height needed for buttons
+
     local totalButtonWidth = buttonWidth + padding
     local totalButtonHeight = buttonHeight + padding
     local numButtons = table.getn(presets)
@@ -613,14 +668,14 @@ local function CreateInstanceFrame(name, presets)
         button:SetHeight(buttonHeight)
         button:SetText(preset.label or "Unknown preset") 
 
-        -- Calculate column and row based on index
+
         local column = math.floor((index - 1) / maxButtonsPerColumn)
         local row = (index - 1) - (column * maxButtonsPerColumn)
 
-        -- Position the button
+
         button:SetPoint("TOPLEFT", frame, "TOPLEFT", (frame:GetWidth() - (numColumns * totalButtonWidth - padding)) / 2 + (column * totalButtonWidth), fixedStartY - (row * totalButtonHeight))
 
-        -- OnClick function with additional debug info
+
         button:SetScript("OnClick", function()
             -- Reset all input boxes to zero
             for classRole, inputBox in pairs(inputBoxes) do
@@ -648,14 +703,14 @@ local function CreateInstanceFrame(name, presets)
             end
         end)
 
-        -- OnEnter function to show tooltip
+
         button:SetScript("OnEnter", function()
             GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
             GameTooltip:SetText(preset.tooltip or "No tooltip available")
             GameTooltip:Show()
         end)
 
-        -- OnLeave function to hide tooltip
+
         button:SetScript("OnLeave", function()
             GameTooltip:Hide()
         end)
@@ -668,10 +723,6 @@ local function CreateInstanceFrame(name, presets)
 
     return frame
 end
-
-
-
-
 
     -- Create instance frames
     instanceFrames = {}
@@ -729,10 +780,10 @@ end)
 
   -- Create a full-screen ClickBlockerFrame to handle clicks outside PresetFrame
 local ClickBlockerFrame = CreateFrame("Frame", "ClickBlockerFrame", UIParent)
-ClickBlockerFrame:SetAllPoints(UIParent) -- Covers the entire screen
-ClickBlockerFrame:EnableMouse(true) -- Captures mouse clicks
-ClickBlockerFrame:SetFrameStrata("DIALOG") -- Same strata as PresetFrame
-ClickBlockerFrame:SetFrameLevel(1) -- Below PresetFrame
+ClickBlockerFrame:SetAllPoints(UIParent) 
+ClickBlockerFrame:EnableMouse(true) 
+ClickBlockerFrame:SetFrameStrata("DIALOG") 
+ClickBlockerFrame:SetFrameLevel(1)
 ClickBlockerFrame:SetScript("OnMouseDown", function()
     ClickBlockerFrame:Hide() 
     InstanceButtonsFrame:Hide() 
@@ -746,61 +797,98 @@ end)
 ClickBlockerFrame:Hide() 
 
 	-- Create the "Open FillRaid" button
-	local openFillRaidButton = CreateFrame("Button", "OpenFillRaidButton", UIParent)
-	openFillRaidButton:SetWidth(40)
-	openFillRaidButton:SetHeight(100)
+local savedPositions = {}
+
+local openFillRaidButton = CreateFrame("Button", "OpenFillRaidButton", UIParent)
+openFillRaidButton:SetWidth(40)  
+openFillRaidButton:SetHeight(100) 
 
 
-	-- Set the button's texture to the .tga image
-	openFillRaidButton:SetNormalTexture("Interface\\AddOns\\fillraidbots\\img\\fillraid")
-	-- Optional: You can also set different textures for button states (hover, clicked)
-	openFillRaidButton:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight")  -- Hover effect
-	openFillRaidButton:SetPushedTexture("Interface\\AddOns\\fillraidbots\\img\\fillraid")  -- Click effect
+openFillRaidButton:SetNormalTexture("Interface\\AddOns\\fillraidbots\\img\\fillraid")
+openFillRaidButton:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight")  
+openFillRaidButton:SetPushedTexture("Interface\\AddOns\\fillraidbots\\img\\fillraid")  
+openFillRaidButton:SetMovable(true)
+openFillRaidButton:EnableMouse(true)
+openFillRaidButton:RegisterForDrag("LeftButton")
 
-	-- Set the OnClick behavior
-	openFillRaidButton:SetScript("OnClick", function()
-		if FillRaidFrame:IsShown() then
-			FillRaidFrame:Hide()
-			fillRaidFrameManualClose = true
-		else
-			FillRaidFrame:Show()
-			fillRaidFrameManualClose = false
-		end
-	end)
+-- Initialize button position
+function InitializeButtonPosition()
+    local position = savedPositions["OpenFillRaidButton"] or {x = -20, y = 250}
+    openFillRaidButton:SetPoint("CENTER", PCPFrame, "LEFT", position.x, position.y) 
+end
 
-	openFillRaidButton:Hide()
+function ToggleButtonMovement(button)
+    if FillRaidBotsSavedSettings.moveButtonsEnabled then
+        openFillRaidButton:SetMovable(true)
+        QueueMessage("Movable enabled for OpenFillRaidButton", "debug")
+
+        openFillRaidButton:SetScript("OnDragStart", function()
+            this:StartMoving()
+            this.isMoving = true
+        end)
+
+        openFillRaidButton:SetScript("OnDragStop", function()
+            this:StopMovingOrSizing()
+            this.isMoving = false
+            local point, _, _, x, y = this:GetPoint()
+            savedPositions["OpenFillRaidButton"] = {x = x, y = y}
+            QueueMessage("Coordinates: x: " .. tostring(x) .. ", y: " .. tostring(y), "debug") 
+        end)		
+    else
+        --openFillRaidButton:SetMovable(false)
+        -- Remove drag scripts
+        openFillRaidButton:SetScript("OnDragStart", nil)
+        openFillRaidButton:SetScript("OnDragStop", nil)
+        QueueMessage("Movable disabled for OpenFillRaidButton", "debug")
+    end
+end
+
+-- Call this function initially to set the button's movement state
+ToggleButtonMovement(openFillRaidButton)
+
+-- Set the OnClick behavior
+openFillRaidButton:SetScript("OnClick", function()
+    if FillRaidFrame:IsShown() then
+        FillRaidFrame:Hide()
+        fillRaidFrameManualClose = true
+    else
+        FillRaidFrame:Show()
+        fillRaidFrameManualClose = false
+    end
+end)
+
+openFillRaidButton:Hide()
 
 
-	-- Create the "Kick All" button below OpenFillRaidButton
-	local kickAllButton = CreateFrame("Button", "OpenFillRaidButton", UIParent)
-	kickAllButton:SetWidth(40)
-	kickAllButton:SetHeight(100)
-	
-	kickAllButton:SetNormalTexture("Interface\\AddOns\\fillraidbots\\img\\kickall")
-	-- Optional: You can also set different textures for button states (hover, clicked)
-	kickAllButton:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight")  -- Hover effect
-	kickAllButton:SetPushedTexture("Interface\\AddOns\\fillraidbots\\img\\kickall")  -- Click effect
+-- Create the "Kick All" button below OpenFillRaidButton
+local kickAllButton = CreateFrame("Button", "KickAllButton", UIParent)
+kickAllButton:SetWidth(40)  -- Fixed width
+kickAllButton:SetHeight(100) -- Fixed height
+
+kickAllButton:SetNormalTexture("Interface\\AddOns\\fillraidbots\\img\\kickall")
+kickAllButton:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight")  -- Hover effect
+kickAllButton:SetPushedTexture("Interface\\AddOns\\fillraidbots\\img\\kickall")  -- Click effect
+
+kickAllButton:SetScript("OnClick", function()
+    UninviteAllRaidMembers()  
+end)
+kickAllButton:Hide() 
+
+-- Function to update the position of the openFillRaidButton and kickAllButton relative to PCPFrame
+local function UpdateButtonPosition()
+    if PCPFrame and PCPFrame:IsVisible() then
+        InitializeButtonPosition()
+    
+        kickAllButton:ClearAllPoints()
+        kickAllButton:SetPoint("TOP", openFillRaidButton, "BOTTOM", 0, -10) 
+    end
+end
 
 
-	kickAllButton:SetScript("OnClick", function()
-		UninviteAllRaidMembers()  
-	end)
-	kickAllButton:Hide() 
+UpdateButtonPosition()
 
-	-- Function to update the position of the openFillRaidButton and kickAllButton relative to PCPFrame
-	local function UpdateButtonPosition()
-		if PCPFrame and PCPFrame:IsVisible() then
-			-- Position OpenFillRaidButton
-			openFillRaidButton:ClearAllPoints()
-			openFillRaidButton:SetPoint("RIGHT", PCPFrame, "LEFT", 0, 250)
 
-			-- Position KickAllButton below OpenFillRaidButton
-			kickAllButton:ClearAllPoints()
-			kickAllButton:SetPoint("TOP", openFillRaidButton, "BOTTOM", 0, -10) -- Adjust position to be under OpenFillRaidButton
-		end
-	end
-
-	-- Create a frame to periodically check the visibility of PCPFrame
+	-- frame to periodically check the visibility of PCPFrame
 	local visibilityFrame = CreateFrame("Frame")
 	visibilityFrame:SetScript("OnUpdate", function()
 		if PCPFrame and PCPFrame:IsVisible() then
@@ -829,15 +917,13 @@ ClickBlockerFrame:Hide()
 
 end
 
--- Call the function to create the UI when the addon is loaded
+-- function to create the UI when the addon is loaded
 CreateFillRaidUI()
 
 
-
--- Table to keep track of the last time a message was shown
+-- check if the message should be shown based on cooldown
 local messageCooldowns = {}
 
--- Function to check if the message should be shown based on cooldown
 local function shouldShowMessage(message)
     local currentTime = GetTime() 
     for pattern, cooldown in pairs(messagesToHide) do
@@ -859,19 +945,17 @@ local function shouldShowMessage(message)
 end
 
 -- Hook the default chat frame's AddMessage function
-local function HideBotMessages(self, message, r, g, b, id)
-    -- Only hide messages if the setting is enabled
+local function HideBotMessages(this, message, r, g, b, id)
     if not FillRaidBotsSavedSettings.isBotMessagesEnabled then
-        self:OriginalAddMessage(message, r, g, b, id)
+        this:OriginalAddMessage(message, r, g, b, id)
         return
     end
 
-    -- Proceed with the normal message filtering logic
     if not shouldShowMessage(message) then
         return -- Do nothing, effectively hiding the message
     end
 
-    self:OriginalAddMessage(message, r, g, b, id)
+    this:OriginalAddMessage(message, r, g, b, id)
 end
 
 -- Apply the hook to all chat frames

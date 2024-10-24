@@ -15,5 +15,9 @@ messagesToHide = {
   ["has left the raid group"] = 60,
   ["All bots are moving."] = 60,  
   ["is moving"] = 60,  
+  ["is not a party bot."] = 0,    
+  ["gameobjects found!"] = 60,    
+  ["used the object."] = 60, 
+  ["in range of the object."] = 60,   
   ["All party bots are now attacking"] = 5 -- Show this message after 5 seconds if it matches
 }

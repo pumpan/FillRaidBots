@@ -1,5 +1,4 @@
 	naxxramasPresets = {
-		-- Old presets
 		{
 			label = "PatchW",
 			values = {
@@ -85,7 +84,6 @@
 			tooltip = "4 Horsemen"
 		},
 
-		-- New Naxxramas presets
 		{
 			label = "Anub'Rekhan",
 			values = {
@@ -203,7 +201,7 @@
 			values = {
 				["warrior tank"] = 2,
 				["warrior meleedps"] = 10,
-				["paladin healer"] = 8, -- Adjust healers based on your healer composition
+				["paladin healer"] = 8, 
 				["rogue meleedps"] = 17,
 				["druid healer"] = 8,
 			},
@@ -213,7 +211,7 @@
 			label = "Broodlord",
 			values = {
 				["warrior tank"] = 2,
-				["healer"] = 8, -- Adjust healers
+				["healer"] = 8, 
 				["rogue meleedps"] = 29,
 			},
 			tooltip = "Broodlord Lashlayer (2 tanks, 8 healers, rest rogues)"
@@ -239,11 +237,11 @@
 		{
 			label = "Chromaggus",
 			values = {
-				["warrior tank"] = 2,
-				["druid healer"] = 1,
+				["warrior tank"] = 4,
+				["druid healer"] = 8,
 				["priest healer"] = 2,
 				["paladin healer"] = 8,
-				["warrior meleedps"] = 26,
+				["rogue meleedps"] = 17,
 			},
 			tooltip = "Chromaggus (2 tanks, 1 druid healer, 2 priests, 8 paladins, 26 warriors)"
 		},
@@ -395,10 +393,10 @@
 		{
 			label = "Sartura",
 			values = {
-				["tank"] = 1, -- Adjust tank class
+				["warrior tank"] = 1, 
 				["paladin healer"] = 6,
 				["druid healer"] = 2,
-				["mage rangedps"] = 31,
+				["mage rangedps"] = 30,
 			},
 			tooltip = "Battleguard Sartura (1 tank, 6 paladin healers, 2 druid healers, rest mages)"
 		},
@@ -504,7 +502,7 @@
 		{
 			label = "Ayamiss",
 			values = {
-				["tank"] = 2, -- Adjust tank class
+				["warrior tank"] = 2, 
 				["paladin healer"] = 3,
 				["priest healer"] = 2,
 				["mage rangedps"] = 14,
@@ -514,7 +512,7 @@
 		{
 			label = "Buru",
 			values = {
-				["tank"] = 2, -- Adjust tank class
+				["warrior tank"] = 2, 
 				["paladin healer"] = 2,
 				["mage rangedps"] = 15,
 			},
@@ -598,7 +596,7 @@
 		},
 	}
 
-	-- Preset data for Other instance (if needed)
+
 	otherPresets = {
 		{
 			label = "Example Other Preset",

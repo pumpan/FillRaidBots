@@ -19,6 +19,10 @@ function FillRaidBots_SaveSettings()
     if DebugMessagesCheckButton then
         FillRaidBotsSavedSettings.debugMessagesEnabled = DebugMessagesCheckButton:GetChecked() and true or false
     end
+    if moveButtonsCheckButton then
+        FillRaidBotsSavedSettings.moveButtonsEnabled = moveButtonsCheckButton:GetChecked() and true or false
+    end
+	
 
 end
 
@@ -111,9 +115,32 @@ local function CreateToggleCheckButton()
     debugMessagesCheckButton:SetScript("OnLeave", function()
         GameTooltip:Hide()
     end)
+
+    local moveButtonsCheckButton = CreateFrame("CheckButton", "moveButtonsCheckButton", UISettingsFrame, "UICheckButtonTemplate")
+    moveButtonsCheckButton:SetWidth(30)
+    moveButtonsCheckButton:SetHeight(30)
+    moveButtonsCheckButton:SetPoint("TOPLEFT", UISettingsFrame, "TOPLEFT", 10, -130)
+
+    moveButtonsCheckButton.text = moveButtonsCheckButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    moveButtonsCheckButton.text:SetPoint("LEFT", moveButtonsCheckButton, "RIGHT", 5, 0)
+    moveButtonsCheckButton.text:SetText("Enable moving buttons")
+
+    moveButtonsCheckButton:SetChecked(FillRaidBotsSavedSettings.moveButtonsEnabled)
+
+    moveButtonsCheckButton:SetScript("OnClick", function(self)
+        FillRaidBotsSavedSettings.moveButtonsEnabled = moveButtonsCheckButton:GetChecked()
+		ToggleButtonMovement(OpenFillRaidButton)
+    end)
+    moveButtonsCheckButton:SetScript("OnEnter", function()
+        GameTooltip:SetOwner(moveButtonsCheckButton, "ANCHOR_RIGHT")
+        GameTooltip:SetText("Enable moving of fillraid and kick all buttons.")
+        GameTooltip:Show()
+    end)
+    moveButtonsCheckButton:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+	
 end
-
-
 
 -- Load settings function
 function FillRaidBots_LoadSettings()
@@ -126,9 +153,8 @@ function FillRaidBots_LoadSettings()
 
     -- Ensure default values if they are nil
     if FillRaidBotsSavedSettings.isCheckAndRemoveEnabled == nil then
-        FillRaidBotsSavedSettings.isCheckAndRemoveEnabled = true -- Default to enabled
-        DEFAULT_CHAT_FRAME:AddMessage("Defaulting CheckAndRemove to enabled") -- Debug message
-
+        FillRaidBotsSavedSettings.isCheckAndRemoveEnabled = true 
+        DEFAULT_CHAT_FRAME:AddMessage("Defaulting CheckAndRemove to enabled") 
     end
 
     if FillRaidBotsSavedSettings.isBotMessagesEnabled == nil then
@@ -137,9 +163,13 @@ function FillRaidBots_LoadSettings()
     if FillRaidBotsSavedSettings.debugMessagesEnabled == nil then
         FillRaidBotsSavedSettings.debugMessagesEnabled = false -- Default to disabled
     end
+    if FillRaidBotsSavedSettings.moveButtonsEnabled == nil then
+        FillRaidBotsSavedSettings.moveButtonsEnabled = false -- Default to disabled
+    end
 
-    -- Create the toggle check buttons
     CreateToggleCheckButton()
+    InitializeButtonPosition()
+    ToggleButtonMovement(openFillRaidButton)
 
     -- Force the button's checked state based on loaded settings
     ToggleCheckAndRemoveCheckButton:SetChecked(FillRaidBotsSavedSettings.isCheckAndRemoveEnabled)
