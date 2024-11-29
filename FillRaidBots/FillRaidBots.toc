@@ -2,7 +2,9 @@
 ## Title: |cFF006699Optional -|r FillRaidBots
 ## Notes: Fill raid with bots
 ## SavedVariables: FillRaidBotsSavedSettings
+Debugger.lua
 SuppressBotMsg.lua
 UISettings.lua
+
 Presets.lua
 FillRaidBots.xml

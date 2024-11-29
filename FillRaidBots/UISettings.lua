@@ -8,7 +8,7 @@ end
 
 local settingsLoaded = false
 
--- Save settings function
+
 function FillRaidBots_SaveSettings()
     if ToggleCheckAndRemoveCheckButton then
         FillRaidBotsSavedSettings.isCheckAndRemoveEnabled = ToggleCheckAndRemoveCheckButton:GetChecked() and true or false
@@ -22,25 +22,26 @@ function FillRaidBots_SaveSettings()
     if moveButtonsCheckButton then
         FillRaidBotsSavedSettings.moveButtonsEnabled = moveButtonsCheckButton:GetChecked() and true or false
     end
-	
-
+    if RefillButtonCheckButton then
+        FillRaidBotsSavedSettings.isRefillEnabled = RefillButtonCheckButton:GetChecked() and true or false
+    end
 end
 
--- Register the event handler
+
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:RegisterEvent("PLAYER_LOGOUT")
 frame:SetScript("OnEvent", FillRaidBots_OnEvent)
 
--- Create toggle check buttons
+
 local function CreateToggleCheckButton()
-    -- Create "Auto Remove Dead Bots" button
+    
     local checkButton = CreateFrame("CheckButton", "ToggleCheckAndRemoveCheckButton", UISettingsFrame, "UICheckButtonTemplate")
     checkButton:SetWidth(30)
     checkButton:SetHeight(30)
     checkButton:SetPoint("TOPLEFT", UISettingsFrame, "TOPLEFT", 10, -10)
 
-    -- Create a text label for the button
+    
     checkButton.text = checkButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     checkButton.text:SetPoint("LEFT", checkButton, "RIGHT", 5, 0)
     checkButton.text:SetText("Auto Remove Dead Bots")
@@ -66,7 +67,7 @@ local function CreateToggleCheckButton()
         GameTooltip:Hide()
     end)
 
-    -- Create "Bot Messages" button
+    
     local botMessagesCheckButton = CreateFrame("CheckButton", "BotMessagesCheckButton", UISettingsFrame, "UICheckButtonTemplate")
     botMessagesCheckButton:SetWidth(30)
     botMessagesCheckButton:SetHeight(30)
@@ -91,7 +92,34 @@ local function CreateToggleCheckButton()
         GameTooltip:Hide()
     end)
 
-    -- Create "Debug Messages" button
+
+    
+    local refillCheckButton = CreateFrame("CheckButton", "RefillButtonCheckButton", UISettingsFrame, "UICheckButtonTemplate")
+    refillCheckButton:SetWidth(30)
+    refillCheckButton:SetHeight(30)
+    refillCheckButton:SetPoint("TOPLEFT", UISettingsFrame, "TOPLEFT", 10, -170)
+
+    refillCheckButton.text = refillCheckButton:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    refillCheckButton.text:SetPoint("LEFT", refillCheckButton, "RIGHT", 5, 0)
+    refillCheckButton.text:SetText("Enable Refill Button")
+
+    refillCheckButton:SetChecked(FillRaidBotsSavedSettings.isRefillEnabled)
+
+    refillCheckButton:SetScript("OnClick", function(self)
+        FillRaidBotsSavedSettings.isRefillEnabled = refillCheckButton:GetChecked()
+		UpdateReFillButtonVisibility()
+    end)
+
+    refillCheckButton:SetScript("OnEnter", function()
+        GameTooltip:SetOwner(refillCheckButton, "ANCHOR_RIGHT")
+        GameTooltip:SetText("When enabled, the Refill Button will be available.")
+        GameTooltip:Show()
+    end)
+    refillCheckButton:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+
+    
     local debugMessagesCheckButton = CreateFrame("CheckButton", "DebugMessagesCheckButton", UISettingsFrame, "UICheckButtonTemplate")
     debugMessagesCheckButton:SetWidth(30)
     debugMessagesCheckButton:SetHeight(30)
@@ -105,6 +133,7 @@ local function CreateToggleCheckButton()
 
     debugMessagesCheckButton:SetScript("OnClick", function(self)
         FillRaidBotsSavedSettings.debugMessagesEnabled = debugMessagesCheckButton:GetChecked()
+		debuggerFrame:Show()
     end)
 
     debugMessagesCheckButton:SetScript("OnEnter", function()
@@ -142,35 +171,47 @@ local function CreateToggleCheckButton()
 	
 end
 
--- Load settings function
+
 function FillRaidBots_LoadSettings()
     if settingsLoaded then return end
     settingsLoaded = true
-    
+
     if not FillRaidBotsSavedSettings then
         FillRaidBotsSavedSettings = {}
     end
 
-    -- Ensure default values if they are nil
+    
     if FillRaidBotsSavedSettings.isCheckAndRemoveEnabled == nil then
         FillRaidBotsSavedSettings.isCheckAndRemoveEnabled = true 
         DEFAULT_CHAT_FRAME:AddMessage("Defaulting CheckAndRemove to enabled") 
     end
 
     if FillRaidBotsSavedSettings.isBotMessagesEnabled == nil then
-        FillRaidBotsSavedSettings.isBotMessagesEnabled = true -- Default to enabled
+        FillRaidBotsSavedSettings.isBotMessagesEnabled = true
     end
+
     if FillRaidBotsSavedSettings.debugMessagesEnabled == nil then
-        FillRaidBotsSavedSettings.debugMessagesEnabled = false -- Default to disabled
+        FillRaidBotsSavedSettings.debugMessagesEnabled = false
     end
+
     if FillRaidBotsSavedSettings.moveButtonsEnabled == nil then
-        FillRaidBotsSavedSettings.moveButtonsEnabled = false -- Default to disabled
+        FillRaidBotsSavedSettings.moveButtonsEnabled = false
+    end
+
+    if FillRaidBotsSavedSettings.isRefillEnabled == nil then
+        FillRaidBotsSavedSettings.isRefillEnabled = true 
     end
 
     CreateToggleCheckButton()
     InitializeButtonPosition()
     ToggleButtonMovement(openFillRaidButton)
 
-    -- Force the button's checked state based on loaded settings
+	if FillRaidBotsSavedSettings.debugMessagesEnabled then  
+		debuggerFrame:Show()
+	else
+		debuggerFrame:Hide()
+	end
+
+    
     ToggleCheckAndRemoveCheckButton:SetChecked(FillRaidBotsSavedSettings.isCheckAndRemoveEnabled)
 end

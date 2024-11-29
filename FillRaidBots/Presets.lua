@@ -183,7 +183,7 @@
 			tooltip = "Frostwyrm Lair Kel'Thuzad"
 		}
 
-		-- Add more Naxxramas presets as needed
+		
 	}
 
 	bwlPresets = {
@@ -203,7 +203,7 @@
 				["warrior meleedps"] = 10,
 				["paladin healer"] = 8, 
 				["rogue meleedps"] = 17,
-				["druid healer"] = 8,
+				["druid healer"] = 2,
 			},
 			tooltip = "Vaelastrasz the Corrupt (2 tanks, 8 healers, rest rogues)"
 		},
@@ -211,7 +211,8 @@
 			label = "Broodlord",
 			values = {
 				["warrior tank"] = 2,
-				["healer"] = 8, 
+				["paladin healer"] = 6, 
+				["druid healer"] = 2, 				
 				["rogue meleedps"] = 29,
 			},
 			tooltip = "Broodlord Lashlayer (2 tanks, 8 healers, rest rogues)"
@@ -220,7 +221,7 @@
 			label = "Ebonroc",
 			values = {
 				["warrior tank"] = 2,
-				["healer"] = 8,
+				["paladin healer"] = 8,
 				["warrior meleedps"] = 29,
 			},
 			tooltip = "Ebonroc (2 tanks, 8 healers, rest warrior meleedps)"
@@ -229,7 +230,7 @@
 			label = "Firemaw",
 			values = {
 				["warrior tank"] = 2,
-				["healer"] = 2,
+				["paladin healer"] = 2,
 				["warrior meleedps"] = 35,
 			},
 			tooltip = "Firemaw (2 tanks, 8 healers, rest warrior meleedps)"
@@ -598,15 +599,7 @@
 
 
 	otherPresets = {
-		{
-			label = "Example Other Preset",
-			values = {
-				["warrior tank"] = 0,
-				["mage rangedps"] = 0,
-				-- Add other roles as needed
-			},
-			tooltip = "Description of the Other Preset"
-		},
+
 		{
 			label = "Melee group",
 			values = {

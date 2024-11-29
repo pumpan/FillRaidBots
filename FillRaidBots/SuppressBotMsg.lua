@@ -1,4 +1,4 @@
--- List of message patterns to hide and their cooldowns 0 = disabled 60 = one message every 60 sec
+
 messagesToHide = {
   ["New party bot added."] = 0, 
   ["All party bots are casting AoE spells at"] = 10, 
@@ -19,5 +19,5 @@ messagesToHide = {
   ["gameobjects found!"] = 60,    
   ["used the object."] = 60, 
   ["in range of the object."] = 60,   
-  ["All party bots are now attacking"] = 5 -- Show this message after 5 seconds if it matches
+  ["All party bots are now attacking"] = 5 
 }
