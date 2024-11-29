@@ -17,7 +17,8 @@ This addon is an extension for the **PartyBot Command Panel (PCP)** for **World 
 ![Preset Selection](ScreenShots/fillraidbots3.png)
 - **Kick All Button:**
   - Removes all bots from the raid while keeping one bot to avoid disbanding the raid.
-
+- **Refill Raid button:**
+Replaces bots that die and are removed during gameplay.
 - **Settings Menu:**
   - Provides options to enable automatic dead bot removal.
   - Allows users to suppress bot messages for a cleaner interface.
@@ -50,7 +51,10 @@ This addon is an extension for the **PartyBot Command Panel (PCP)** for **World 
 4. **Kick All Bots:**
    - Click the "Kick All" button to remove all bots from the raid, ensuring that at least one bot remains to prevent disbanding.
 
-5. **Adjust Settings:**
+5. **Refill Raid button:**
+Replaces bots that die and are removed during gameplay.
+
+6. **Adjust Settings:**
    - Access the settings menu to enable automatic dead bot removal and suppress bot messages as needed.
 
 ## Presets
@@ -68,7 +72,18 @@ The addon includes optimized presets for several dungeons and raids:
 - **Presets.lua** edit this file to add or change a preset
 
 ## Changelog
-Fillraidbots 1.2.0
+
+**Fillraidbots 2.0.0**
+
+    🆕 Added: A debugger window for when debugging is enabled. All debug messages are now sent here instead of cluttering the chat window.
+    🆕 Added: A version checker that notifies you if a newer version of the addon is available.
+    🆕 Added: Logic to distribute healers evenly across the raid when bots are added.
+    🆕 Added: Class and role detection in the raid, enabling new functionality such as managing bots based on their roles.
+    🆕 Added: A new "Refill Raid" button, which replaces bots that die and are removed during gameplay.
+    🛠 Fixed: The /uninviteraid slash handler to prevent conflicts with WoW's native commands like /kick and /uninvite, which were unintentionally uninviting the entire raid. (Reported by Gemma)
+    🔄 Version updated: From 1.2.0 to 2.0.0, marking this as a major update due to significant new features and functionality improvements.
+
+**Fillraidbots 1.2.0**
 
     🛠 Fixed: Since the latest server update, which prevents adding bots while in combat, an issue occurred where adding certain bots, such as warriors or hunters, caused you to enter combat for a few seconds. This created a problem where the addon attempted to add bots when they couldn't be added. I have now fixed it so that the addon detects when you're in combat and pauses until you're out of combat.
 
@@ -78,7 +93,7 @@ Fillraidbots 1.2.0
 
     🔄 Version updated: Incremented from 1.1.0 to 1.2.0 to reflect both the addition of new features (movable buttons and visible version number) and the resolution of a bug related to combat behavior. This update introduces functional improvements while maintaining backward compatibility.
 
-Fillraidbots 1.1.0
+**Fillraidbots 1.1.0**
 
     🛠 Added: : Checks if you are in a raid and there is still 1 old bot remaining. Removes the old bot when there are 10 new bots in the raid.
 
