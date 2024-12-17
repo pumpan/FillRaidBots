@@ -20,12 +20,12 @@ local classes = {
 }
 local addonName = "FillRaidBots"
 local addonPrefix = "FillRaidBotsVersion"
-local versionNumber = "2.0.0"
+local versionNumber = "2.0.1"
 local botCount = 0
 local initialBotRemoved = false
 local firstBotName = nil
 local messageQueue = {}
-local delay = 0.2 
+local delay = 0.1 
 local nextUpdateTime = 0 
 
 local classCounts = {}
@@ -79,10 +79,24 @@ function RetryMessageQueueProcessing()
             combatCheckFrame:SetScript("OnUpdate", nil) 
             ProcessMessageQueue() 
         else
-            
+            --print("Still in combat, retrying...")
         end
     end
 end
+local firstBotRemovalFrame = CreateFrame("Frame")
+firstBotRemovalFrame:RegisterEvent("RAID_ROSTER_UPDATE")
+
+
+firstBotRemovalFrame:SetScript("OnEvent", function()
+    
+    if not initialBotRemoved and GetNumRaidMembers() >= 3 then
+        if firstBotName then
+            QueueMessage("Removed first bot: " .. firstBotName, "debugremove")
+            UninviteMember(firstBotName, "firstBotRemoved")
+
+        end
+    end
+end)
 
 
 function ProcessMessageQueue()
@@ -90,6 +104,24 @@ function ProcessMessageQueue()
         local messageInfo = table.remove(messageQueue, 1)
         local message = messageInfo.message
         local recipient = messageInfo.recipient
+
+
+        local colors = {
+            Error = "|cFFFF0000",     
+            WARNING = "|cFFFFA500",  
+            INFO = "|cFFFFFF00",     
+            Detected = "|cFF00FF00", 
+            Added = "|cFF00FF00",     
+			Removing = "|cFFADD8E6",
+			Removed = "|cFFADD8E6",
+			Fixgroups = "|cFFDDA0DD"
+        }
+        local resetColor = "|r" 
+
+        
+        for keyword, color in pairs(colors) do
+            message = string.gsub(message, "(" .. keyword .. ")", color .. "%1" .. resetColor)
+        end
 
         
         if recipient == "SAY" then
@@ -161,20 +193,7 @@ function ProcessMessageQueue()
             SendChatMessage(message, recipient)
         end
 
-        
-        if messageInfo.incrementBotCount then
-            botCount = botCount + 1
-            
-            if botCount == 11 and not initialBotRemoved then
-                if firstBotName then
-                    UninviteMember(firstBotName, "firstBotRemoved")
 
-                else
-                    QueueMessage("Error: First bot's name not captured.", "debugerror")
-                end
-                initialBotRemoved = true
-            end
-        end
     end
 end
 
@@ -204,7 +223,7 @@ RoleDetector:RegisterEvent("PLAYER_ENTERING_WORLD")
 RoleDetector:RegisterEvent("CHAT_MSG_SPELL_FRIENDLYPLAYER_DAMAGE")
 RoleDetector:RegisterEvent("CHAT_MSG_SPELL_PARTY_DAMAGE")
 RoleDetector:RegisterEvent("CHAT_MSG_COMBAT_PARTY_HITS")
-
+--RoleDetector:RegisterEvent("CHAT_MSG_SPELL_PERIODIC_CREATURE_DAMAGE")
 RoleDetector:RegisterEvent("PARTY_MEMBERS_CHANGED")
 RoleDetector:RegisterEvent("RAID_ROSTER_UPDATE")
 
@@ -222,7 +241,7 @@ local spellDictionary = {
     ["Shield Block"] = {class = "warrior", role = "tank", confidenceIncrease = 3},
     ["Mocking Blow"] = {class = "warrior", role = "tank", confidenceIncrease = 3},
     ["Greater Armor"] = {class = "warrior", role = "tank", confidenceIncrease = 3},	
-    
+    --["Heroic Strike"] = {class = "warrior", role = "meleedps", confidenceIncrease = 3},
     ["Mortal Strike"] = {class = "warrior", role = "meleedps", confidenceIncrease = 3},
     ["Bloodthirst"] = {class = "warrior", role = "meleedps", confidenceIncrease = 3},
     ["Whirlwind"] = {class = "warrior", role = "meleedps", confidenceIncrease = 3},
@@ -250,7 +269,7 @@ local spellDictionary = {
     ["Ferocious Bite"] = {class = "druid", role = "meleedps", confidenceIncrease = 3},
     ["Shred"] = {class = "druid", role = "meleedps", confidenceIncrease = 3},
     ["Healing Touch"] = {class = "druid", role = "healer", confidenceIncrease = 3},
-    
+    --["Rejuvenation"] = {class = "druid", role = "healer", confidenceIncrease = 3},
     ["Regrowth"] = {class = "druid", role = "healer", confidenceIncrease = 3},
     ["Tranquility"] = {class = "druid", role = "healer", confidenceIncrease = 3},
     ["Starfire"] = {class = "druid", role = "rangedps", confidenceIncrease = 3},
@@ -546,7 +565,7 @@ local function CheckRaidAuras()
                 if buffTexture == "Interface\\Icons\\INV_Potion_86" then
                     hasTankBuff = true  
                     if not detectedPlayers[unitName] then
-                        
+                        --print(unitName .. " (Tank) has Greater Armor or equivalent active.")
                         detectedPlayers[unitName] = true  
                         updateRoleConfidence(unitName, unitClass, "tank", 3, "Greater Armor")
                     end
@@ -555,7 +574,7 @@ local function CheckRaidAuras()
                 
                 if buffTexture == "Interface\\Icons\\Spell_Frost_FrostArmor02" then
                     if not detectedPlayers[unitName] then
-                        
+                        --print(unitName .. " has Ice Armor active.")
                         detectedPlayers[unitName] = true  
                         updateRoleConfidence(unitName, "mage", "rangedps", 3, "Ice Armor")
                     end
@@ -582,8 +601,6 @@ local function CheckRaidAuras()
 end
 
 
-
-
 RoleDetector:SetScript("OnEvent", function()
     if event == "PARTY_MEMBERS_CHANGED" or event == "RAID_ROSTER_UPDATE" then
         wasInGroup = GetNumPartyMembers() > 0 or GetNumRaidMembers() > 0
@@ -594,8 +611,6 @@ RoleDetector:SetScript("OnEvent", function()
         DetectRole()
     end
 end)
-
-
 
 
 local RoleRemoverFrame = CreateFrame("Frame")
@@ -703,12 +718,13 @@ function UninviteMember(name, reason)
 
     
     if reason == "dead" then
-        
+        --print("DEBUG: Uninviting due to death:", normalizedName)  
         QueueMessage(normalizedName .. " has been uninvited because they are dead.", "debugremove")
     elseif reason == "firstBotRemoved" then
-        QueueMessage("10 bots added. Removing party bot: " .. normalizedName, "debugremove")
+        QueueMessage("Removing party bot: " .. normalizedName, "debugremove")
         firstBotName = nil
 		ReplaceDeadBot[normalizedName] = nil
+        initialBotRemoved = true 
     else
         QueueMessage(normalizedName .. " has been uninvited.", "debugremove")  
     end
@@ -717,12 +733,12 @@ function resetData()
     playerData = {}  
     detectedPlayers = {}  
     detectedPlayerCount = 0  
-    QueueMessage("All player data has been reset.", "debuginfo")
+    QueueMessage("INFO: All player data has been reset.", "debuginfo")
 end
 
 SLASH_ROLELIST1 = "/rolelist"
 SlashCmdList["ROLELIST"] = function()
-    QueueMessage("Player Role List:", "debuginfo")
+    QueueMessage("INFO: Player Role List:", "debuginfo")
     local count = 0
 
     
@@ -759,7 +775,7 @@ SlashCmdList["REPLACELIST"] = function()
         QueueMessage("Replaced Bot List:", "debuginfo")
         for playerName, data in pairs(ReplaceDeadBot) do
             QueueMessage(playerName .. " - Class: " .. data.classColored .. ", Role: " .. data.role, "debuginfo")
-            
+            --QueueMessage(".partybot add " .. data.classColored .. " " .. data.role, "SAY", true)
         end
 
     end
@@ -775,7 +791,7 @@ local function CheckAndRemoveDeadBots()
 
 
 	if not (IsRaidLeader() or IsRaidOfficer()) and GetNumRaidMembers() > 0 then
-		QueueMessage("You must be a raid leader or officer to remove bots.", "debuginfo")
+		QueueMessage("WARNING: You must be a raid leader or officer to remove bots.", "debuginfo")
 		return
 	end
 
@@ -793,7 +809,7 @@ local function CheckAndRemoveDeadBots()
             end
             messagecantremove = false 
         elseif not messagecantremove then
-            QueueMessage("Saving the last bot so the raid does not disband.", "debuginfo")
+            QueueMessage("INFO: Saving the last bot so the raid does not disband.", "debuginfo")
             messagecantremove = true
         end
     elseif GetNumPartyMembers() > 0 then
@@ -828,7 +844,7 @@ local function SaveRaidMembersAndSetFirstBot()
     end
     
     if firstBotName then
-        QueueMessage("First bot in raid set to: " .. firstBotName, "debuginfo")
+        QueueMessage("INFO: First bot in raid set to: " .. firstBotName, "debuginfo")
     else
         QueueMessage("Error: No bot found to set as the first bot in raid.", "debugerror")
     end
@@ -868,7 +884,7 @@ function resetfirstbot_OnEvent()
             initialBotRemoved = false
             firstBotName = nil
 			botCount = 0
-            QueueMessage("Bot state reset: No members in party or raid.", "debuginfo")
+            QueueMessage("INFO: Bot state reset: No members in party or raid.", "debuginfo")
         end
     end
 end
@@ -900,11 +916,26 @@ function FillRaid_OnLoad()
   this:RegisterEvent('GROUP_ROSTER_UPDATE')
   this:RegisterEvent("ADDON_LOADED")
   this:RegisterEvent("CHAT_MSG_SYSTEM")
-  QueueMessage("FillRaid [" .. versionNumber .. "]|cff00FF00 loaded|cffffffff", "none")
+  QueueMessage("FillRaidBots [" .. versionNumber .. "]|cff00FF00 loaded|cffffffff", "none")
 end
 
+----------------------------------------------FixGroups----------------------------------------------------------------------
+local MAX_PLAYERS_PER_GROUP = 5
+local MAX_GROUPS = 8
+local isFixingGroups = false
+local moveDelay = 0.1 
+local lastMoveTime = 0
+local moveQueue = {} 
+local healerClasses = {"PALADIN", "PRIEST", "DRUID", "SHAMAN"} 
+local currentPhase = 1
+local FixGroups
+
+
+
+
+
+------------------------------------------------------FILLRAID WICH CALLS FIXGROUPS-------------------------------------------------------------------------
 local function FillRaid()
-    
     if GetNumRaidMembers() > 0 then
         if GetNumRaidMembers() == 2 then
             SaveRaidMembersAndSetFirstBot() 
@@ -927,7 +958,7 @@ local function FillRaid()
                 end
             end)
             waitForPartyFrame:Show()
-            return 
+            return
         end
 
         
@@ -941,144 +972,385 @@ local function FillRaid()
         end
     end
 
-local healers = {}
-local others = {}
-local healerCounts = {}
-local otherCounts = {}
+    local healers = {}
+    local others = {}
+    totalHealers = 0
+    local totalOthers = 0
 
-
-for class, count in pairs(classCounts) do
-    if string.find(class, "healer") then
-        healerCounts[class] = count
-        for i = 1, count do
-            table.insert(healers, class)
+    
+    for class, count in pairs(classCounts) do
+        if string.find(class, "healer") then
+            for i = 1, count do
+                table.insert(healers, class)
+            end
+            totalHealers = totalHealers + count
+        else
+            for i = 1, count do
+                table.insert(others, class)
+            end
+            totalOthers = totalOthers + count
         end
-    else
-        otherCounts[class] = count
-        for i = 1, count do
-            table.insert(others, class)
+    end
+
+    
+    totalHealers = totalHealers or 0
+    totalOthers = totalOthers or 0
+
+    
+    totaly = totalHealers + totalOthers
+
+    QueueMessage("Added: Going to add healers:" .. totalHealers, "debugfilling")
+    QueueMessage("Added: Going to add classes:" .. totalOthers, "debugfilling")
+    QueueMessage("Added: Totaly:" .. totaly, "debugfilling")
+
+    
+    local function countTableEntries(tbl)
+        local count = 0
+        for _ in pairs(tbl) do
+            count = count + 1
+        end
+        return count
+    end
+
+    
+    local function addBot(class)
+        local classColors = {
+            warrior = "|cFFC79C6E",   
+            mage = "|cFF40C7EB",      
+            warlock = "|cFF8788EE",   
+            hunter = "|cFFABD473",    
+            rogue = "|cFFFFF569",     
+            paladin = "|cFFF58CBA",   
+            shaman = "|cFF0070DE",    
+            druid = "|cFFFF7D0A",     
+            priest = "|cFFFFFFFF",    
+        }
+        local resetColor = "|r"  
+
+        local plainClass = string.lower(class)
+
+        
+        local coloredClass = class
+        for className, color in pairs(classColors) do
+            if string.find(plainClass, className) then
+                coloredClass = string.gsub(class, className, color .. className .. resetColor)
+                break
+            end
+        end
+
+        
+        QueueMessage(".partybot add " .. plainClass, "SAY", true)
+        QueueMessage("Added " .. coloredClass, "debuginfo")
+    end
+
+    
+    local function addothers()
+        QueueMessage("addothers called", "debuginfo")
+
+        
+        local otherClassesCount = countTableEntries(others)
+        if otherClassesCount == 0 then
+            QueueMessage("No other classes to add.", "debugfilling")
+            return
+        end
+
+        
+        for _, otherClass in ipairs(others) do
+            addBot(otherClass)
+        end
+        QueueMessage("Raid filling complete.", "none")
+    end
+
+    
+    if totalHealers == 0 then
+        QueueMessage("No healers found. Skipping healer addition.", "debugfilling")
+        addothers()
+        return
+    end
+
+    
+    local totalHealersAdded = 0
+    for _, healerClass in ipairs(healers) do
+        addBot(healerClass)
+        totalHealersAdded = totalHealersAdded + 1
+
+        
+        if totalHealersAdded == totalHealers then
+            
+            local waitForHealersFrame = CreateFrame("Frame")
+            waitForHealersFrame:SetScript("OnUpdate", function()
+				if GetNumRaidMembers() >= totalHealers + 1 then
+					waitForHealersFrame:SetScript("OnUpdate", nil)
+					waitForHealersFrame:Hide()
+					QueueMessage("Fixgroups: All healers are in the raid. Starting FixGroups after 1-second delay.", "debuginfo")
+
+					
+					local fixGroupsDelayTimer = CreateFrame("Frame")
+					local fixGroupsStartTime = GetTime()
+					fixGroupsDelayTimer:SetScript("OnUpdate", function()
+						if GetTime() - fixGroupsStartTime >= 1 then
+							fixGroupsDelayTimer:SetScript("OnUpdate", nil)
+							fixGroupsDelayTimer:Hide()
+
+							
+							isFixingGroups = true
+							currentPhase = 1
+							lastMoveTime = 0
+							moveQueue = {}
+							FixGroups()
+
+							
+							local delayTimer = CreateFrame("Frame")
+							local delayStartTime = GetTime()
+							delayTimer:SetScript("OnUpdate", function()
+								if GetTime() - delayStartTime >= 5 then
+									delayTimer:SetScript("OnUpdate", nil)
+									delayTimer:Hide()
+									
+									QueueMessage("Added: Adding other classes after healers.", "debugfilling")
+									addothers()
+								end
+							end)
+							delayTimer:Show()
+						end
+					end)
+					fixGroupsDelayTimer:Show()
+				end
+
+            end)
+            waitForHealersFrame:Show()
+            break
         end
     end
 end
 
 
-local function addBot(class)
-    local classColors = {
-        warrior = "|cFFC79C6E",   
-        mage = "|cFF40C7EB",      
-        warlock = "|cFF8788EE",   
-        hunter = "|cFFABD473",    
-        rogue = "|cFFFFF569",     
-        paladin = "|cFFF58CBA",   
-        shaman = "|cFF0070DE",    
-        druid = "|cFFFF7D0A",     
-        priest = "|cFFFFFFFF",    
-    }
-    local resetColor = "|r"  
+-------------------------fixgroups ------------------------------------------
+local function QueueMove(player, group)
+    table.insert(moveQueue, {player = player, group = group})
+end
+
+local function GetTableLength(tbl)
+    local count = 0
+    for _ in pairs(tbl) do
+        count = count + 1
+    end
+    return count
+end
+
+
+local function TableContains(tbl, value)
+    for _, v in pairs(tbl) do
+        if v == value then
+            return true
+        end
+    end
+    return false
+end
+
+local function ProcessMoveQueue()
+    local currentTime = GetTime() 
+    if currentTime >= (lastMoveTime + moveDelay) and GetTableLength(moveQueue) > 0 then
+        local nextMove = table.remove(moveQueue, 1)
+        local player = nextMove.player
+        local group = nextMove.group
+
+        if not player.moved then
+            SetRaidSubgroup(player.index, group)
+            player.moved = true
+            lastMoveTime = currentTime
+        end
+    end
+
+    if GetTableLength(moveQueue) == 0 then
+        if currentPhase == 1 then
+            QueueMessage("Fixgroups: Phase 1 complete, starting Phase 2", "debuginfo")
+            currentPhase = 2
+            FixGroups()
+        else
+            QueueMessage("Fixgroups: Phase 2 complete, groups organized", "debuginfo")
+            isFixingGroups = false
+        end
+    end
+end
+
+
+function FixGroups()
+    local groupSizes = {}
+    local groupClasses = {} 
+    local healers = {}
 
     
-
-    local plainClass = string.lower(class)
+    for i = 1, MAX_GROUPS do
+        groupSizes[i] = 0
+        groupClasses[i] = {}
+    end
 
     
-    local coloredClass = class
-    for className, color in pairs(classColors) do
-        if string.find(plainClass, className) then
-            coloredClass = string.gsub(class, className, color .. className .. resetColor)
+    local playerName = UnitName("player") 
+    local healerCounts = {} 
+    for _, healerClass in ipairs(healerClasses) do
+        healerCounts[healerClass] = 0
+    end
+
+    for i = 1, GetNumRaidMembers() do
+        local name, _, subgroup, _, _, class, _, online = GetRaidRosterInfo(i)
+        
+        
+        if name ~= playerName and class and TableContains(healerClasses, class) then
+            local player = {name = name, index = i, group = subgroup, class = class, online = online, moved = false}
+            table.insert(healers, player)
+
+            
+            healerCounts[class] = (healerCounts[class] or 0) + 1
+        end
+    end
+
+    
+    local maxGroups = (totaly <= 20) and 4 or MAX_GROUPS 
+
+    
+    local runPhase2 = false
+    for class, count in pairs(healerCounts) do
+        if count >= 8 then
+            runPhase2 = true
             break
         end
     end
 
     
-    QueueMessage(".partybot add " .. plainClass, "SAY", true)
-    QueueMessage("Added " .. coloredClass, "debuginfo")
+    if currentPhase == 1 then
+        
+        local healersByClass = {}
+        for _, healer in ipairs(healers) do
+            if not healersByClass[healer.class] then
+                healersByClass[healer.class] = {}
+            end
+            table.insert(healersByClass[healer.class], healer)
+        end
 
-end
+        
+        local groupIndex = 1
+        for class, classHealers in pairs(healersByClass) do
+            
+            if table.getn(classHealers) > maxGroups then
+                
+                QueueMessage("Warning: Too many healers of class " .. class .. ", assigning remaining healers randomly.", "debugfilling")
+            end
 
+            for _, healer in ipairs(classHealers) do
+                
+                local attempts = 0
+                while TableContains(groupClasses[groupIndex], healer.class) and groupIndex <= maxGroups do
+                    groupIndex = groupIndex + 1
+                    if groupIndex > maxGroups then
+                        groupIndex = 1 
+                    end
 
+                    attempts = attempts + 1
+                    if attempts > 20 then
+                        
+                        QueueMessage("Error: Too many of " .. class .. " in raid. Assigning to available group.", "debugerror")
+                        break
+                    end
+                end
 
+                
+                QueueMove(healer, groupIndex)
+                groupSizes[groupIndex] = groupSizes[groupIndex] + 1
+                table.insert(groupClasses[groupIndex], healer.class) 
 
-local groupCount = 8
-local healerIndex = 1
-local otherIndex = 1
+                
+                groupIndex = groupIndex + 1
+                if groupIndex > maxGroups then
+                    groupIndex = 1
+                end
+            end
+        end
+    elseif currentPhase == 2 and runPhase2 then
+        
+        local healersByClass = {}
+        for _, healer in ipairs(healers) do
+            if not healersByClass[healer.class] then
+                healersByClass[healer.class] = {}
+            end
+            table.insert(healersByClass[healer.class], healer)
+        end
 
+        
+        local groupIndex = 1
+        local allHealersAssigned = false
+        while not allHealersAssigned do
+            allHealersAssigned = true  
 
-local totalHealers = 0
-for _, count in pairs(healerCounts) do
-    totalHealers = totalHealers + count
-end
+            
+            for _, classHealers in pairs(healersByClass) do
+                if table.getn(classHealers) > 0 then
+                    
+                    local healer = table.remove(classHealers, 1)
 
+                    
+                    local attempts = 0
+                    while TableContains(groupClasses[groupIndex], healer.class) and groupIndex <= maxGroups do
+                        groupIndex = groupIndex + 1
+                        if groupIndex > maxGroups then
+                            groupIndex = 1
+                        end
 
-local druidHealers = healerCounts["druid healer"] or 0
-local addExtraDruid = (druidHealers >= 8 and totalHealers >= 16)
+                        attempts = attempts + 1
+                        if attempts > 20 then
+                            
+                            QueueMessage("Error: Too many of " .. healer.class .. " in raid. Assigning to available group.", "debugerror")
+                            break
+                        end
+                    end
 
-
-local totalHealerLength = 0
-for _ in pairs(healers) do
-    totalHealerLength = totalHealerLength + 1
-end
-totalHealerLength = tonumber(totalHealerLength) or 0  
-
-local totalOtherLength = 0
-for _ in pairs(others) do
-    totalOtherLength = totalOtherLength + 1
-end
-totalOtherLength = tonumber(totalOtherLength) or 0  
-
-
-for groupIndex = 1, groupCount do
-    
-    local botsToAdd = (groupIndex == 1) and 4 or 5
-
-    
-    if healerIndex <= totalHealerLength then
-        addBot(healers[healerIndex])
-        healerIndex = healerIndex + 1
-        botsToAdd = botsToAdd - 1
+                    
+                    QueueMove(healer, groupIndex)
+                    groupSizes[groupIndex] = groupSizes[groupIndex] + 1
+                    table.insert(groupClasses[groupIndex], healer.class) 
+                    allHealersAssigned = false  
+                end
+            end
+        end
     end
-    
-    
-    if addExtraDruid and druidHealers > 0 and botsToAdd > 0 then
-        addBot("druid healer")
-        QueueMessage("Druid healers left: " .. druidHealers, "debugfilling")
-        druidHealers = druidHealers - 1
-        botsToAdd = botsToAdd - 1
-    end
 
     
-    for addedCount = 1, botsToAdd do
-        if otherIndex <= totalOtherLength then
-            addBot(others[otherIndex])
-            otherIndex = otherIndex + 1
+    for group, size in pairs(groupSizes) do
+        local classesInGroup = {}
+        for _, class in ipairs(groupClasses[group]) do
+            classesInGroup[class] = (classesInGroup[class] or 0) + 1
+        end
+        local classStrs = {}
+        for class, count in pairs(classesInGroup) do
+            table.insert(classStrs, count .. " x " .. class)
         end
     end
 end
 
 
-while healerIndex <= totalHealerLength do
-    
-    if healers[healerIndex] ~= "druid healer" or druidHealers > 0 then
-        addBot(healers[healerIndex])
-        if healers[healerIndex] == "druid healer" then
-            druidHealers = druidHealers - 1
-            QueueMessage("Druid healers left: " .. druidHealers, "debugfilling")
-        end
+
+
+local frame = CreateFrame("Frame")
+frame:SetScript("OnUpdate", function(self, elapsed)
+    if not isFixingGroups then
+        return
     end
-    healerIndex = healerIndex + 1
+    ProcessMoveQueue()
+end)
+
+frame:Show()
+
+SlashCmdList["FIXGROUPS"] = function()
+    isFixingGroups = true
+    currentPhase = 1
+    lastMoveTime = 0
+    moveQueue = {}
+    FixGroups()
 end
 
-
-while otherIndex <= totalOtherLength do
-    addBot(others[otherIndex])
-    otherIndex = otherIndex + 1
-end
-
-
-    QueueMessage("Raid filling complete.", "none")
-end
-
-
-
+SLASH_FIXGROUPS1 = "/fixgroups"
+----------------------------------------------------------THE UI------------------------------------------------------------------------------------
 
 function CreateFillRaidUI()
     FillRaidFrame = CreateFrame("Frame", "FillRaidFrame", UIParent) 
@@ -1570,7 +1842,7 @@ function ToggleButtonMovement(button)
             QueueMessage("Coordinates: x: " .. tostring(x) .. ", y: " .. tostring(y), "debuginfo") 
         end)		
     else
-        
+        --openFillRaidButton:SetMovable(false)
         
         openFillRaidButton:SetScript("OnDragStart", nil)
         openFillRaidButton:SetScript("OnDragStop", nil)
@@ -1643,7 +1915,7 @@ reFillButton:SetScript("OnClick", function()
         end
         
         ReplaceDeadBot = {}
-		
+		--resetData()
 
         QueueMessage("Replaced Bot List has been cleared.", "debugfilling")
 
@@ -1781,7 +2053,7 @@ SlashCmdList["UNINVITE_RAID"] = function()
 end
 
 
-
+--------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -1975,5 +2247,5 @@ end)
 
 
 
-
+----------------------------------------------------------------------------------------------------------------------
 

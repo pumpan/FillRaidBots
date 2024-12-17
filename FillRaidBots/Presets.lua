@@ -1,3 +1,10 @@
+------------------------------------------------------------------
+------------------------------------------------------------------
+--   You Can Edit this file to your liking
+--   An Easy way is to ctrl+h  with notepad and search and replace 
+--   for an example search for paladin replace with: shaman
+------------------------------------------------------------------
+------------------------------------------------------------------
 	naxxramasPresets = {
 		{
 			label = "PatchW",
@@ -25,8 +32,8 @@
 		{
 			label = "Gluth",
 			values = {
-				["warrior tank"] = 9,
-				["rogue meleedps"] = 23,
+				["warrior tank"] = 8,
+				["rogue meleedps"] = 22,
 				["mage rangedps"] = 1,
 				["paladin healer"] = 5,
 				["priest healer"] = 2,
@@ -105,7 +112,7 @@
 				["paladin healer"] = 5,
 				["rogue meleedps"] = 0,
 				["priest healer"] = 2,
-				["druid healer"] = 2,
+				["druid healer"] = 4,
 			},
 			tooltip = "SpiderWing Grand Widow Faerlina"
 		},
@@ -113,7 +120,7 @@
 			label = "Maexxna",
 			values = {
 				["warrior tank"] = 9,
-				["mage rangedps"] = 16,
+				["mage rangedps"] = 15,
 				["paladin healer"] = 5,
 				["rogue meleedps"] = 3,
 				["priest healer"] = 2,
@@ -130,7 +137,7 @@
 				["paladin healer"] = 4,
 				["rogue meleedps"] = 6,
 				["priest healer"] = 2,
-				["druid healer"] = 3,
+				["druid healer"] = 6,
 			},
 			tooltip = "PlagueWing Noth the Plaguebringer"
 		},
@@ -138,7 +145,7 @@
 			label = "Heigan",
 			values = {
 				["warrior tank"] = 5,
-				["mage rangedps"] = 17,
+				["mage rangedps"] = 21,
 				["paladin healer"] = 4,
 				["rogue meleedps"] = 5,
 				["priest healer"] = 2,
@@ -150,7 +157,7 @@
 			label = "Loatheb",
 			values = {
 				["warrior tank"] = 4,
-				["mage rangedps"] = 18,
+				["mage rangedps"] = 21,
 				["paladin healer"] = 5,
 				["rogue meleedps"] = 4,
 				["priest healer"] = 3,
@@ -164,7 +171,7 @@
 				["warrior tank"] = 10,
 				["mage rangedps"] = 12,
 				["paladin healer"] = 5,
-				["rogue meleedps"] = 4,
+				["rogue meleedps"] = 5,
 				["priest healer"] = 4,
 				["druid healer"] = 3,
 			},
@@ -174,7 +181,7 @@
 			label = "Kel'Thuzad",
 			values = {
 				["warrior tank"] = 12,
-				["mage rangedps"] = 10,
+				["mage rangedps"] = 7,
 				["paladin healer"] = 6,
 				["rogue meleedps"] = 6,
 				["priest healer"] = 4,
@@ -250,7 +257,7 @@
 			label = "Nefarian",
 			values = {
 				["warrior tank"] = 2,
-				["paladin healer"] = 9,
+				["paladin healer"] = 8,
 				["rogue meleedps"] = 29,
 			},
 			tooltip = "Nefarian (2 tanks, 9 paladin healers, rest rogues)"
@@ -378,7 +385,7 @@
 			label = "Skeram",
 			values = {
 				["warrior tank"] = 2,
-				["warrior meleedps"] = 38,
+				["warrior meleedps"] = 37,
 			},
 			tooltip = "The Prophet Skeram (2 tanks, rest warrior meleedps)"
 		},
@@ -387,7 +394,7 @@
 			values = {
 				["warrior tank"] = 4,
 				["paladin healer"] = 8,
-				["warrior meleedps"] = 28,
+				["warrior meleedps"] = 27,
 			},
 			tooltip = "Bug Trio (4 tanks, 8 paladin healers, rest warrior meleedps)"
 		},
@@ -427,7 +434,7 @@
 			values = {
 				["warrior tank"] = 2,
 				["paladin healer"] = 1,
-				["warrior meleedps"] = 37,
+				["warrior meleedps"] = 36,
 			},
 			tooltip = "Princess Huhuran (2 tanks, 1 paladin healer, rest warrior meleedps)"
 		},
@@ -438,7 +445,7 @@
 				["paladin healer"] = 4,
 				["druid healer"] = 3,
 				["mage rangedps"] = 14,
-				["rogue meleedps"] = 13,
+				["rogue meleedps"] = 14,
 			},
 			tooltip = "The Twin Emperors (4 tanks, 4 paladin healers, 3 druid healers, 14 mages, 13 rogues)"
 		},
@@ -448,7 +455,7 @@
 				["warrior tank"] = 2,
 				["paladin healer"] = 5,
 				["druid healer"] = 2,
-				["warrior meleedps"] = 31,
+				["warrior meleedps"] = 30,
 			},
 			tooltip = "Ouro (2 tanks, 5 paladin healers, 2 druid healers, rest warrior meleedps)"
 		},
@@ -457,7 +464,7 @@
 			values = {
 				["paladin healer"] = 8,
 				["druid healer"] = 4,
-				["rogue meleedps"] = 28,
+				["rogue meleedps"] = 27,
 			},
 			tooltip = "C'Thun (8 paladin healers, 4 druid healers, rest rogues)"
 		}
