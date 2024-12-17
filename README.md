@@ -73,6 +73,15 @@ The addon includes optimized presets for several dungeons and raids:
 
 ## Changelog
 
+**Fillraidbots 2.0.1**
+
+    🆕 Improved: Made the process of adding bots a little faster.
+    🆕 Added: Bots are now added in a new way: healers are added first, sorted into different groups, and then all other classes are added.
+    🛠 Fixed: Adjusted and fixed some presets for better functionality.
+    🔄 Version updated: From 2.0.0 to 2.0.1.
+
+
+
 **Fillraidbots 2.0.0**
 
     🆕 Added: A debugger window for when debugging is enabled. All debug messages are now sent here instead of cluttering the chat window.
