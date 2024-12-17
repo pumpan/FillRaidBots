@@ -72,7 +72,7 @@ function RetryMessageQueueProcessing()
         lastTimeChecked = currentTime 
 
         if not IsAnyRaidMemberInCombat() then
-            QueueMessage("Resuming..", "none")
+            DEFAULT_CHAT_FRAME:AddMessage("Resuming..", "none")
             isInCombat = false
             retryTimerRunning = false
 			incombatmessagesent = false	
@@ -128,7 +128,7 @@ function ProcessMessageQueue()
             
             if IsAnyRaidMemberInCombat() then
 				if not incombatmessagesent then 
-					QueueMessage("Raid member in combat, waiting..", "none")
+					DEFAULT_CHAT_FRAME:AddMessage("Raid member in combat, waiting..", "none")
 					incombatmessagesent = true	
 				end	
                 isInCombat = true
