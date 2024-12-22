@@ -72,6 +72,9 @@ The addon includes optimized presets for several dungeons and raids:
 - **Presets.lua** edit this file to add or change a preset
 
 ## Changelog
+**FillraidBots 2.0.2**
+    🆕 Updated the preset.lua and fillraidbot.lua to now detect the player's faction and load the appropriate presets for Horde or Alliance.
+    🔄 Version updated: From 2.0.1 to 2.0.2.
 
 **Fillraidbots 2.0.1**
 
