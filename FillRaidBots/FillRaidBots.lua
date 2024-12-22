@@ -20,7 +20,7 @@ local classes = {
 }
 local addonName = "FillRaidBots"
 local addonPrefix = "FillRaidBotsVersion"
-local versionNumber = "2.0.1"
+local versionNumber = "2.0.2"
 local botCount = 0
 local initialBotRemoved = false
 local firstBotName = nil
@@ -37,6 +37,7 @@ local isCheckAndRemoveEnabled = false
 if FillRaidBotsSavedSettings == nil then
     FillRaidBotsSavedSettings = {}
 end
+
 
 
 
@@ -784,16 +785,20 @@ end
 
 local messagecantremove = false
 
+local hasWarnedNoPermission = false -- Declare this outside the function
+
 local function CheckAndRemoveDeadBots()
     if not FillRaidBotsSavedSettings.isCheckAndRemoveEnabled then return end
     local playerName = UnitName("player")
 
-
-
-	if not (IsRaidLeader() or IsRaidOfficer()) and GetNumRaidMembers() > 0 then
-		QueueMessage("WARNING: You must be a raid leader or officer to remove bots.", "debuginfo")
-		return
-	end
+    if not (IsRaidLeader() or IsRaidOfficer()) and GetNumRaidMembers() > 0 then
+        if not hasWarnedNoPermission then
+            QueueMessage("WARNING: You must be a raid leader or officer to remove bots.", "debuginfo")
+            hasWarnedNoPermission = true
+        end
+        return
+    end
+	hasWarnedNoPermission = false 
 
     if GetNumRaidMembers() > 0 then
         
@@ -917,9 +922,11 @@ function FillRaid_OnLoad()
   this:RegisterEvent("ADDON_LOADED")
   this:RegisterEvent("CHAT_MSG_SYSTEM")
   QueueMessage("FillRaidBots [" .. versionNumber .. "]|cff00FF00 loaded|cffffffff", "none")
+  factionName, factionGroup = UnitFactionGroup("player")
 end
 
-----------------------------------------------FixGroups----------------------------------------------------------------------
+
+------------------------------------------------------FILLRAID WICH CALLS FIXGROUPS-------------------------------------------------------------------------
 local MAX_PLAYERS_PER_GROUP = 5
 local MAX_GROUPS = 8
 local isFixingGroups = false
@@ -930,11 +937,6 @@ local healerClasses = {"PALADIN", "PRIEST", "DRUID", "SHAMAN"}
 local currentPhase = 1
 local FixGroups
 
-
-
-
-
-------------------------------------------------------FILLRAID WICH CALLS FIXGROUPS-------------------------------------------------------------------------
 local function FillRaid()
     if GetNumRaidMembers() > 0 then
         if GetNumRaidMembers() == 2 then
@@ -1640,7 +1642,7 @@ function CreateFillRaidUI()
 
 
     
-local function CreateInstanceFrame(name, presets)
+function CreateInstanceFrame(name, presets)
     local frame = CreateFrame("Frame", name, UIParent)
     frame:SetWidth(200)
     frame:SetHeight(350)

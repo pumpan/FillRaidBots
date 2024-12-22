@@ -1,7 +1,4 @@
------------------------------------------------------------------------------------------------------
--- List of message patterns to hide and their cooldowns 0 = disabled 60 = one message every 60 sec
--- Add patterns to yourr liking
------------------------------------------------------------------------------------------------------
+
 messagesToHide = {
   ["New party bot added."] = 0, 
   ["All party bots are casting AoE spells at"] = 10, 
