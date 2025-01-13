@@ -72,6 +72,15 @@ The addon includes optimized presets for several dungeons and raids:
 - **Presets.lua** edit this file to add or change a preset
 
 ## Changelog
+
+**FillraidBots 2.0.3**
+
+    🆕 New: Added logic to prevent kicking players in the same guild when adding bots, when a player dies, or when using the "Kick All" button.
+
+    🛠 Fixed: Resolved an issue where players using a non-English client language received an error.
+
+    🔄 Version updated: To 2.0.3. This update introduces significant improvements to functionality and fixes, marking it as a minor update.
+
 **FillraidBots 2.0.2**
 
     🆕 Now detects the player's faction and load the appropriate presets for Horde or Alliance.
