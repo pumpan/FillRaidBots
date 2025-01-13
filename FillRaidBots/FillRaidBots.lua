@@ -20,7 +20,7 @@ local classes = {
 }
 local addonName = "FillRaidBots"
 local addonPrefix = "FillRaidBotsVersion"
-local versionNumber = "2.0.2"
+local versionNumber = "2.0.3"
 local botCount = 0
 local initialBotRemoved = false
 local firstBotName = nil
@@ -87,15 +87,15 @@ end
 local firstBotRemovalFrame = CreateFrame("Frame")
 firstBotRemovalFrame:RegisterEvent("RAID_ROSTER_UPDATE")
 
-
 firstBotRemovalFrame:SetScript("OnEvent", function()
     
     if not initialBotRemoved and GetNumRaidMembers() >= 3 then
+		
         if firstBotName then
             QueueMessage("Removed first bot: " .. firstBotName, "debugremove")
             UninviteMember(firstBotName, "firstBotRemoved")
-
         end
+
     end
 end)
 
@@ -114,6 +114,7 @@ function ProcessMessageQueue()
             Detected = "|cFF00FF00", 
             Added = "|cFF00FF00",     
 			Removing = "|cFFADD8E6",
+			REMOVING = "|cFFADD8E6",			
 			Removed = "|cFFADD8E6",
 			Fixgroups = "|cFFDDA0DD"
         }
@@ -575,7 +576,7 @@ local function CheckRaidAuras()
                 
                 if buffTexture == "Interface\\Icons\\Spell_Frost_FrostArmor02" then
                     if not detectedPlayers[unitName] then
-                        --print(unitName .. " has Ice Armor active.")
+                        print(unitName .. " has Ice Armor active.")
                         detectedPlayers[unitName] = true  
                         updateRoleConfidence(unitName, "mage", "rangedps", 3, "Ice Armor")
                     end
@@ -608,10 +609,71 @@ RoleDetector:SetScript("OnEvent", function()
     elseif event == "UNIT_AURA" then
         CheckRaidAuras()
     else
-        
+      
         DetectRole()
     end
 end)
+
+SLASH_SHOWUNDETECTED1 = "/showundetected"  
+
+local function ShowUndetectedPlayers()
+    local playerName = UnitName("player")
+    local undetectedPlayers = {}
+    local undetectedCount = 0
+    local detectedCount = 0
+
+
+    if GetNumRaidMembers() > 0 then
+        for i = 1, GetNumRaidMembers() do
+            local unitId = "raid" .. i
+            local unitName = UnitName(unitId)
+            if unitName and unitName ~= playerName then
+                local normalizedName = normalizePlayerName(unitName)
+
+                if detectedPlayers[normalizedName] then
+                    detectedCount = detectedCount + 1
+                else
+                    undetectedCount = undetectedCount + 1
+                    table.insert(undetectedPlayers, unitName) 
+                end
+            end
+        end
+    else
+
+        for i = 1, GetNumPartyMembers() do
+            local unitId = "party" .. i
+            local unitName = UnitName(unitId)
+            if unitName and unitName ~= playerName then
+                local normalizedName = normalizePlayerName(unitName)
+
+                if detectedPlayers[normalizedName] then
+                    detectedCount = detectedCount + 1
+                else
+                    undetectedCount = undetectedCount + 1
+                    table.insert(undetectedPlayers, unitName) 
+                end
+            end
+        end
+    end
+
+
+    QueueMessage("INFO: Detected players: " .. detectedCount, "debuginfo")
+    QueueMessage("INFO: Undetected players: " .. undetectedCount, "debuginfo")
+
+
+    if undetectedCount > 0 then
+        QueueMessage("INFO: The following players are undetected:", "debuginfo")
+        for _, name in ipairs(undetectedPlayers) do
+            QueueMessage("- " .. name, "debuginfo")
+        end
+    else
+        QueueMessage("INFO: All players in the group have been detected.", "debuginfo")
+    end
+end
+
+
+-- Register the slash command handler
+SlashCmdList["SHOWUNDETECTED"] = ShowUndetectedPlayers
 
 
 local RoleRemoverFrame = CreateFrame("Frame")
@@ -719,7 +781,6 @@ function UninviteMember(name, reason)
 
     
     if reason == "dead" then
-        --print("DEBUG: Uninviting due to death:", normalizedName)  
         QueueMessage(normalizedName .. " has been uninvited because they are dead.", "debugremove")
     elseif reason == "firstBotRemoved" then
         QueueMessage("Removing party bot: " .. normalizedName, "debugremove")
@@ -785,7 +846,9 @@ end
 
 local messagecantremove = false
 
-local hasWarnedNoPermission = false -- Declare this outside the function
+local hasWarnedNoPermission = false 
+local messagecantremove = false
+local guildDeadStatus = {} 
 
 local function CheckAndRemoveDeadBots()
     if not FillRaidBotsSavedSettings.isCheckAndRemoveEnabled then return end
@@ -798,21 +861,44 @@ local function CheckAndRemoveDeadBots()
         end
         return
     end
-	hasWarnedNoPermission = false 
+    hasWarnedNoPermission = false
+
+    local function buildGuildRoster()
+        local guildMembers = {}
+        for j = 1, GetNumGuildMembers() do
+            local guildName = GetGuildRosterInfo(j)
+            if guildName then
+                guildMembers[guildName] = true
+            end
+        end
+        return guildMembers
+    end
 
     if GetNumRaidMembers() > 0 then
-        
         if GetNumRaidMembers() > 2 then
             for i = 1, GetNumRaidMembers() do
                 local name, _, _, _, _, _, _, _, isDead = GetRaidRosterInfo(i)
                 local unit = "raid" .. i
 
-                
-                if isDead and UnitExists(unit) and not UnitIsGhost(unit) and name ~= playerName then
-                    UninviteMember(name, "dead")
+                if UnitExists(unit) and name ~= playerName then
+                    local guildMembers = buildGuildRoster()
+
+                    if isDead and not UnitIsGhost(unit) then
+                        if guildMembers[name] then
+                            if not guildDeadStatus[name] then
+                                QueueMessage("INFO: STOPPED FROM KICKING GUILD MEMBER.", "debuginfo")
+                                guildDeadStatus[name] = true
+                            end
+                        else
+                            UninviteMember(name, "dead")
+                        end
+                    else
+                        guildDeadStatus[name] = nil 
+
+                    end
                 end
             end
-            messagecantremove = false 
+            messagecantremove = false
         elseif not messagecantremove then
             QueueMessage("INFO: Saving the last bot so the raid does not disband.", "debuginfo")
             messagecantremove = true
@@ -822,42 +908,83 @@ local function CheckAndRemoveDeadBots()
             local unit = "party" .. i
             local name = UnitName(unit)
 
-            if UnitIsDead(unit) and not UnitIsGhost(unit) and name ~= playerName then
-                UninviteMember(name, "dead")
+            if UnitExists(unit) and name ~= playerName then
+                local guildMembers = buildGuildRoster()
+
+                if UnitIsDead(unit) and not UnitIsGhost(unit) then
+                    if guildMembers[name] then
+                        if not guildDeadStatus[name] then
+                            QueueMessage("INFO: STOPPED FROM KICKING GUILD MEMBER.", "debuginfo")
+                            guildDeadStatus[name] = true
+                        end
+                    else
+                        UninviteMember(name, "dead")
+                    end
+                else
+                    guildDeadStatus[name] = nil 
+					
+                end
             end
         end
     end
 end
 
 
+
+
+
 local function SaveRaidMembersAndSetFirstBot()
     local raidMembers = {}
-    local playerName = UnitName("player") 
-    firstBotName = nil  
+    local playerName = UnitName("player")
+    firstBotName = nil
     
+
+    local guildMembers = {}
+    for i = 1, GetNumGuildMembers() do
+        local name = GetGuildRosterInfo(i)
+        if name then
+            guildMembers[name] = true
+        end
+    end
+
     for i = 1, GetNumRaidMembers() do
         local unit = "raid" .. i
         local name = UnitName(unit)
 
-        
         if name and name ~= playerName then
-            table.insert(raidMembers, name)
-            if not firstBotName then
-                firstBotName = name
+            if guildMembers[name] then
+
+                QueueMessage("INFO: " .. name .. " is a member of a guild, skipping!", "debuginfo")
+            else
+
+                if not firstBotName then
+                    firstBotName = name
+                    QueueMessage("INFO: First raid bot set to: " .. firstBotName, "debuginfo")
+
+                end
+                table.insert(raidMembers, name)
             end
         end
     end
-    
-    if firstBotName then
-        QueueMessage("INFO: First bot in raid set to: " .. firstBotName, "debuginfo")
-    else
-        QueueMessage("Error: No bot found to set as the first bot in raid.", "debugerror")
+
+    if not firstBotName then
+        QueueMessage("ERROR: No first Bot found", "debugerror")
     end
 end
 
 
 local function SavePartyMembersAndSetFirstBot()
   local partyMembers = {}
+  local raidMembers = {}
+  local guildMembers = {}
+
+  for i = 1, GetNumGuildMembers() do
+      local name = GetGuildRosterInfo(i)
+      if name then
+          guildMembers[name] = true
+      end
+  end
+
   for i = 1, GetNumPartyMembers() do
       local unit = "party" .. i
       local name = UnitName(unit)
@@ -866,25 +993,41 @@ local function SavePartyMembersAndSetFirstBot()
       end
   end
 
-  
   local playerName = UnitName("player")
-  for _, member in ipairs(partyMembers) do
-      if member ~= playerName then
-          firstBotName = member
-          break
-      end
-  end
 
-  if firstBotName then
-      QueueMessage("First bot set to: " .. firstBotName, "debuginfo")
-  else
-      QueueMessage("Error: No bot found to set as the first bot.", "debugerror")
+
+  for _, member in ipairs(partyMembers) do
+        local guildName = nil
+        
+
+        if guildMembers[member] then
+            guildName = "Member of guild"
+        end
+
+        if member ~= playerName then
+            if guildName then
+
+                QueueMessage("INFO:" .. member .. " is a member of a guild, skipping!", "debuginfo")
+            else
+
+                if not firstBotName then
+                    firstBotName = member
+                    QueueMessage("INFO: First bot set to: " .. firstBotName, "debuginfo")
+                    return
+                end
+            end
+
+            table.insert(raidMembers, member)
+        end
   end
 end
 
 
+
+
 function resetfirstbot_OnEvent()
     if event == "RAID_ROSTER_UPDATE" or event == "PARTY_MEMBERS_CHANGED" then
+
         if GetNumPartyMembers() == 0 and GetNumRaidMembers() == 0 then
             initialBotRemoved = false
             firstBotName = nil
@@ -1042,7 +1185,7 @@ local function FillRaid()
 
         
         QueueMessage(".partybot add " .. plainClass, "SAY", true)
-        QueueMessage("Added " .. coloredClass, "debuginfo")
+        QueueMessage("Added " .. coloredClass, "debugfilling")
     end
 
     
@@ -1844,7 +1987,6 @@ function ToggleButtonMovement(button)
             QueueMessage("Coordinates: x: " .. tostring(x) .. ", y: " .. tostring(y), "debuginfo") 
         end)		
     else
-        --openFillRaidButton:SetMovable(false)
         
         openFillRaidButton:SetScript("OnDragStart", nil)
         openFillRaidButton:SetScript("OnDragStop", nil)
@@ -2035,17 +2177,51 @@ end
 
 
 function UninviteAllRaidMembers()
-  initialBotRemoved = false
-  firstBotName = nil
-  botCount = 0    
-  for i = 2, GetNumRaidMembers() do
-      local unit = "raid" .. tostring(i)
-      local name = UnitName(unit)
-      if name then
-          UninviteByName(name)
-      end
-  end
+    local myName = UnitName("player")
+	initialBotRemoved = false
+	firstBotName = nil
+	botCount = 0    
+
+    local guildMembers = {}
+    for i = 1, GetNumGuildMembers() do
+        local name = GetGuildRosterInfo(i)
+        if name and name ~= myName then
+            guildMembers[name] = true
+        end
+    end
+
+
+    local startIndex = 2
+    for i = 1, GetNumRaidMembers() do
+        local unit = "raid" .. tostring(i)
+        local name = UnitName(unit)
+        if name and guildMembers[name] then
+            startIndex = 1
+            break 
+        end
+    end
+
+
+    for i = startIndex, GetNumRaidMembers() do
+        local unit = "raid" .. tostring(i)
+        local name = UnitName(unit)
+        if name then
+            if name == myName then
+                QueueMessage("INFO: Kept " .. name .. " because it's you.", "debugremove")
+            elseif guildMembers[name] then
+                QueueMessage("INFO: Kept " .. name .. " because they are in your guild.", "debugremove")
+            else
+                QueueMessage("REMOVING: " .. name .. " because they are not in your guild.", "debugremove")
+                UninviteByName(name)
+            end
+        else
+            QueueMessage("ERROR: Skipped uninviting an unknown or nil player at raid slot " .. i, "debugremove")
+        end
+    end
 end
+
+
+
 
 
 
