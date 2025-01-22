@@ -56,6 +56,13 @@ Replaces bots that die and are removed during gameplay.
 
 6. **Adjust Settings:**
    - Access the settings menu to enable automatic dead bot removal and suppress bot messages as needed.
+7. **Slash commands**
+You can now use slash commands so you can make macros
+    - /frb ua or /frb uninvite all – Uninvite all raid members but saves Friends and guild members.
+    - /frb fill – Automatically fill the raid.
+    - /frb open – Open the Fill Raid frame.
+    - /frb refill – Refill the raid.
+    - /frb fixgroups – Fix raid groups.
 
 ## Presets
 
@@ -72,6 +79,28 @@ The addon includes optimized presets for several dungeons and raids:
 - **Presets.lua** edit this file to add or change a preset
 
 ## Changelog
+
+**FillRaidBots 2.1.0**
+
+🔄 Version updated: to 2.1.0, introducing multiple improvements to performance, user experience, and new features.
+
+    🆕 Added: A Credits frame showcasing everyone who has helped in the development of the addon.
+    🆕 Added: Slash commands to improve raid management:
+        /frb ua or /frb uninvite all – Uninvite all raid members.
+        /frb fill – Automatically fill the raid.
+        /frb open – Open the Fill Raid frame.
+        /frb refill – Refill the raid.
+        /frb fixgroups – Fix raid groups.
+    🆕 Fixed: Players on the raid leader's friend list are no longer removed when adding bots, removing dead bots, or using the "Kick All" button (previously, this only applied to guild members).
+
+🛠 Improvements:
+
+    Improved: Debug messages are now separated from commands, enhancing command responsiveness and speed.
+    Improved: Enhanced the process of matching player names, fixing an issue where a mismatch would cause a nil value error.
+
+🐞 Bug Fixes:
+
+    Fixed: An error where player names weren’t matched, which previously led to nil values.
 
 **FillraidBots 2.0.3**
 
