@@ -218,7 +218,7 @@ debugDetectionCheckbox:SetChecked(true)
 debugRemoveCheckbox:SetChecked(true)
 debugErrorCheckbox:SetChecked(true)
 debugInfoCheckbox:SetChecked(true)
-debugVersionCheckbox:SetChecked(false)
+debugVersionCheckbox:SetChecked(true)
 logLevelButton:SetScript("OnClick", function()
     if logLevelFrame:IsShown() then
         logLevelFrame:Hide()
