@@ -82,8 +82,7 @@ The addon includes optimized presets for several dungeons and raids:
 
 **FillRaidBots 2.1.0**
 
-🔄 Version updated: to 2.1.0, introducing multiple improvements to performance, user experience, and new features.
-
+    🔄 Version updated: to 2.1.0, introducing multiple improvements to performance, user experience, and new features.
     🆕 Added: A Credits frame showcasing everyone who has helped in the development of the addon.
     🆕 Added: Slash commands to improve raid management:
         /frb ua or /frb uninvite all – Uninvite all raid members.
