@@ -3,6 +3,7 @@
 -------------------------AND EDIT TO YOUR PREFERED PRESETS------------------------------------------
 ----------------------------------------------------------------------------------------------------
 
+
 local function generateTooltip(values)
     local tooltipParts = {}
     for role, count in pairs(values) do
@@ -85,8 +86,8 @@ local function SetFactionPresets(factionName, factionGroup)
 		{
 			label = "Razzuv",
 			values = {
-				["warrior tank"] = 8,
-				["warrior meleedps"] = 12,
+				["warrior tank"] = 10,
+				["warrior meleedps"] = 10,
 				["rogue meleedps"] = 10,
 				["paladin healer"] = 9,
 				["priest healer"] = 0,
@@ -111,13 +112,14 @@ local function SetFactionPresets(factionName, factionGroup)
 			label = "4 horse",
 			values = {
 				["warrior tank"] = 3,
-				["warrior meleedps"] = 32,
+				["warrior meleedps"] = 35,
 				["rogue meleedps"] = 0,
-				["paladin healer"] = 4,
+				["paladin healer"] = 1,
 				["priest healer"] = 0,
 				["druid healer"] = 0,
 			},
-			fullname = "4 Horsemen"
+			fullname = "4 Horsemen",
+			bosses = {"Baron Rivendare", "Thane Korth'azz", "Lady Blaumeux", "Sir Zeliek"}
 		},
 
 		{
@@ -131,7 +133,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 1,
 				["druid healer"] = 1,
 			},
-			fullname = "SpiderWing Anub'Rekhan"
+			fullname = "Anub'Rekhan"
 		},
 		{
 			label = "Faerlina",
@@ -143,7 +145,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 2,
 				["druid healer"] = 4,
 			},
-			fullname = "SpiderWing Grand Widow Faerlina"
+			fullname = "Grand Widow Faerlina"
 		},
 		{
 			label = "Maexxna",
@@ -156,65 +158,63 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest rangedps"] = 3,
 				["druid healer"] = 2,
 			},
-			fullname = "SpiderWing Maexxna"
+			fullname = "Maexxna"
 		},
 		{
 			label = "Noth",
 			values = {
 				["warrior tank"] = 6,
-				["mage rangedps"] = 15,
+				["mage rangedps"] = 16,
 				["paladin healer"] = 4,
-				["rogue meleedps"] = 6,
-				["priest healer"] = 2,
-				["druid healer"] = 6,
+				["rogue meleedps"] = 9,
+				["priest healer"] = 0,
+				["druid healer"] = 4,
 			},
-			fullname = "PlagueWing Noth the Plaguebringer"
+			fullname = "Noth the Plaguebringer"
 		},
 		{
 			label = "Heigan",
 			values = {
 				["warrior tank"] = 5,
-				["mage rangedps"] = 21,
+				["warrior meleedps"] = 10,
 				["paladin healer"] = 4,
-				["rogue meleedps"] = 5,
+				["rogue meleedps"] = 16,
 				["priest healer"] = 2,
 				["druid healer"] = 2,
 			},
-			fullname = "PlagueWing Heigan the Unclean"
+			fullname = "Heigan the Unclean"
 		},
 		{
 			label = "Loatheb",
 			values = {
 				["warrior tank"] = 4,
-				["mage rangedps"] = 21,
-				["paladin healer"] = 5,
-				["rogue meleedps"] = 4,
-				["priest healer"] = 3,
-				["druid healer"] = 2,
+--				["mage rangedps"] = 0,
+				["paladin healer"] = 2,
+				["rogue meleedps"] = 33,
+--				["priest healer"] = 3,
+--				["druid healer"] = 2,
 			},
-			fullname = "PlagueWing Loatheb"
+			fullname = "Loatheb"
 		},
 		{
 			label = "Sapphiron",
 			values = {
 				["warrior tank"] = 10,
-				["mage rangedps"] = 12,
-				["paladin healer"] = 5,
-				["rogue meleedps"] = 5,
-				["priest healer"] = 4,
-				["druid healer"] = 3,
+				["warrior meleedps"] = 6,
+				["paladin healer"] = 8,
+				["rogue meleedps"] = 17,
+				["druid healer"] = 2,
 			},
 			fullname = "Frostwyrm Lair Sapphiron"
 		},
 		{
 			label = "Kel'Thuzad",
 			values = {
-				["warrior tank"] = 12,
-				["mage rangedps"] = 7,
-				["paladin healer"] = 6,
-				["rogue meleedps"] = 6,
+				["warrior tank"] = 8,
+				["mage rangedps"] = 3,
+				["paladin healer"] = 8,
+				["rogue meleedps"] = 16,
 				["priest healer"] = 4,
-				["druid healer"] = 4,
 			},
 			fullname = "Frostwyrm Lair Kel'Thuzad"
 		}
@@ -230,7 +230,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["paladin healer"] = 8,
 				["mage rangedps"] = 29,
 			},
-			fullname = "Razorgore the Untamed(BWL)"
+			fullname = "Razorgore the Untamed"
 		},
 		{
 			label = "Vaelastrasz",
@@ -241,7 +241,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["rogue meleedps"] = 17,
 				["druid healer"] = 2,
 			},
-			fullname = "Vaelastrasz the Corrupt (BWL)"
+			fullname = "Vaelastrasz the Corrupt"
 		},
 		{
 			label = "Broodlord",
@@ -251,7 +251,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["druid healer"] = 2, 				
 				["rogue meleedps"] = 29,
 			},
-			fullname = "Broodlord Lashlayer (BWL)"
+			fullname = "Broodlord Lashlayer"
 		},
 		{
 			label = "Ebonroc",
@@ -260,7 +260,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["paladin healer"] = 8,
 				["warrior meleedps"] = 29,
 			},
-			fullname = "Ebonroc (BWL)"
+			fullname = "Ebonroc"
 		},
 		{
 			label = "Firemaw",
@@ -269,7 +269,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["paladin healer"] = 2,
 				["warrior meleedps"] = 35,
 			},
-			fullname = "Firemaw (BWL)"
+			fullname = "Firemaw"
 		},
 		{
 			label = "Chromaggus",
@@ -280,7 +280,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["paladin healer"] = 8,
 				["rogue meleedps"] = 17,
 			},
-			fullname = "Chromaggus (BWL)"
+			fullname = "Chromaggus"
 		},
 		{
 			label = "Nefarian",
@@ -289,7 +289,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["paladin healer"] = 8,
 				["rogue meleedps"] = 29,
 			},
-			fullname = "Nefarian (BWL)"
+			fullname = "Nefarian"
 		}
 	}
 
@@ -422,10 +422,11 @@ local function SetFactionPresets(factionName, factionGroup)
 			label = "Bug Trio",
 			values = {
 				["warrior tank"] = 4,
-				["paladin healer"] = 8,
+				["paladin healer"] = 8, 
 				["warrior meleedps"] = 27,
 			},
-			fullname = "Bug Trio"
+			fullname = "Bug Trio (Princess Yauj, Vem, Lord Kri)",
+			bosses = {"Princess Yauj", "Vem", "Lord Kri"}
 		},
 		{
 			label = "Sartura",
@@ -433,7 +434,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["warrior tank"] = 1, 
 				["paladin healer"] = 6,
 				["druid healer"] = 2,
-				["mage rangedps"] = 30,
+				["hunter rangedps"] = 30,
 			},
 			fullname = "Battleguard Sartura"
 		},
@@ -471,13 +472,14 @@ local function SetFactionPresets(factionName, factionGroup)
 		{
 			label = "Twin Emperors",
 			values = {
-				["warrior tank"] = 4,
-				["paladin healer"] = 4,
-				["druid healer"] = 3,
-				["mage rangedps"] = 14,
-				["rogue meleedps"] = 14,
+				["warrior tank"] = 6,
+				["paladin healer"] = 9,
+				["druid healer"] = 0,
+				["mage rangedps"] = 0,
+				["rogue meleedps"] = 24,
 			},
-			fullname = "The Twin Emperors"
+			fullname = "The Twin Emperors",
+			bosses = {"Emperor Vek'lor", "Emperor Vek'nilash"}
 		},
 		{
 			label = "Ouro",
@@ -669,6 +671,7 @@ local function SetFactionPresets(factionName, factionGroup)
 	}
     regenerateTooltips()
 
+
     elseif factionName == "Horde" then
 		DEFAULT_CHAT_FRAME:AddMessage("You are " .. factionGroup)
         ----------------------------------------------------------------------------------------------------
@@ -685,7 +688,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 6,
 				["druid healer"] = 2,
 			},
-			fullname = "AbominationWing PatchWerk"
+			fullname = "PatchWerk"
 		},
 		{
 			label = "GrobB",
@@ -694,7 +697,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["rogue meleedps"] = 29,
 				["shaman healer"] = 8,
 			},
-			fullname = "AbominationWing Grobbulus"
+			fullname = "Grobbulus"
 		},
 		{
 			label = "Gluth",
@@ -706,7 +709,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 5,
 				["druid healer"] = 1,
 			},
-			fullname = "AbominationWing Gluth"
+			fullname = "Gluth"
 		},
 		{
 			label = "Thadd",
@@ -716,14 +719,14 @@ local function SetFactionPresets(factionName, factionGroup)
 				["shaman healer"] = 8,
 
 			},
-			fullname = "AbominationWing Thaddius"
+			fullname = "Thaddius"
 		},
 
 		{
 			label = "Razzuv",
 			values = {
-				["warrior tank"] = 8,
-				["warrior meleedps"] = 12,
+				["warrior tank"] = 10,
+				["warrior meleedps"] = 10,
 				["rogue meleedps"] = 10,
 				["shaman healer"] = 4,
 				["priest healer"] = 5,
@@ -753,7 +756,8 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 1,
 				["druid healer"] = 0,
 			},
-			fullname = "4 Horsemen"
+			fullname = "4 Horsemen",
+			bosses = {"Baron Rivendare", "Thane Korth'azz", "Lady Blaumeux", "Sir Zeliek"}
 		},
 
 		{
@@ -767,7 +771,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 1,
 				["druid healer"] = 1,
 			},
-			fullname = "SpiderWing Anub'Rekhan"
+			fullname = "Anub'Rekhan"
 		},
 		{
 			label = "Faerlina",
@@ -779,7 +783,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 6,
 				["druid healer"] = 4,
 			},
-			fullname = "SpiderWing Grand Widow Faerlina"
+			fullname = "Grand Widow Faerlina"
 		},
 		{
 			label = "Maexxna",
@@ -792,7 +796,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest rangedps"] = 3,
 				["druid healer"] = 2,
 			},
-			fullname = "SpiderWing Maexxna"
+			fullname = "Maexxna"
 		},
 		{
 			label = "Noth",
@@ -800,35 +804,35 @@ local function SetFactionPresets(factionName, factionGroup)
 				["warrior tank"] = 6,
 				["mage rangedps"] = 15,
 				["shaman healer"] = 4,
-				["rogue meleedps"] = 6,
-				["priest healer"] = 2,
-				["druid healer"] = 6,
+				["rogue meleedps"] = 10,
+				["priest healer"] = 0,
+				["druid healer"] = 4,
 			},
-			fullname = "PlagueWing Noth the Plaguebringer"
+			fullname = "Noth the Plaguebringer"
 		},
 		{
 			label = "Heigan",
 			values = {
-				["warrior tank"] = 5,
-				["mage rangedps"] = 21,
-				["shaman healer"] = 2,
-				["rogue meleedps"] = 5,
-				["priest healer"] = 4,
-				["druid healer"] = 2,
+				["warrior tank"] = 4,
+				["mage rangedps"] = 0,
+				["shaman healer"] = 1,
+				["rogue meleedps"] = 34,
+				["priest healer"] = 0,
+				["druid healer"] = 0,
 			},
-			fullname = "PlagueWing Heigan the Unclean"
+			fullname = "Heigan the Unclean"
 		},
 		{
 			label = "Loatheb",
 			values = {
 				["warrior tank"] = 4,
-				["mage rangedps"] = 21,
+--				["mage rangedps"] = 0,
 				["shaman healer"] = 2,
-				["rogue meleedps"] = 4,
-				["priest healer"] = 6,
-				["druid healer"] = 2,
+				["rogue meleedps"] = 33,
+				["priest healer"] = 0,
+				["druid healer"] = 0,
 			},
-			fullname = "PlagueWing Loatheb"
+			fullname = "Loatheb"
 		},
 		{
 			label = "Sapphiron",
@@ -840,7 +844,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 6,
 				["druid healer"] = 3,
 			},
-			fullname = "Frostwyrm Lair Sapphiron"
+			fullname = "Sapphiron"
 		},
 		{
 			label = "Kel'Thuzad",
@@ -852,7 +856,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 6,
 				["druid healer"] = 4,
 			},
-			fullname = "Frostwyrm Lair Kel'Thuzad"
+			fullname = "Kel'Thuzad"
 		}
 
 		
@@ -866,7 +870,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 8,
 				["mage rangedps"] = 29,
 			},
-			fullname = "Razorgore the Untamed(BWL)"
+			fullname = "Razorgore the Untamed"
 		},
 		{
 			label = "Vaelastrasz",
@@ -877,7 +881,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["rogue meleedps"] = 18,
 				["priest healer"] = 1,
 			},
-			fullname = "Vaelastrasz the Corrupt (BWL)"
+			fullname = "Vaelastrasz the Corrupt"
 		},
 		{
 			label = "Broodlord",
@@ -886,7 +890,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["shaman healer"] = 8, 	
 				["rogue meleedps"] = 29,
 			},
-			fullname = "Broodlord Lashlayer (BWL)"
+			fullname = "Broodlord Lashlayer"
 		},
 		{
 			label = "Ebonroc",
@@ -895,7 +899,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["shaman healer"] = 8,
 				["warrior meleedps"] = 29,
 			},
-			fullname = "Ebonroc (BWL)"
+			fullname = "Ebonroc"
 		},
 		{
 			label = "Firemaw",
@@ -904,7 +908,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["shaman healer"] = 2,
 				["warrior meleedps"] = 35,
 			},
-			fullname = "Firemaw (BWL)"
+			fullname = "Firemaw"
 		},
 		{
 			label = "Chromaggus",
@@ -915,7 +919,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 8,
 				["rogue meleedps"] = 17,
 			},
-			fullname = "Chromaggus (BWL)"
+			fullname = "Chromaggus"
 		},
 		{
 			label = "Nefarian",
@@ -925,7 +929,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 1,
 				["rogue meleedps"] = 28,
 			},
-			fullname = "Nefarian (BWL)"
+			fullname = "Nefarian"
 		}
 	}
 
@@ -1061,7 +1065,8 @@ local function SetFactionPresets(factionName, factionGroup)
 				["shaman healer"] = 8,
 				["warrior meleedps"] = 27,
 			},
-			fullname = "Bug Trio"
+			fullname = "Bug Trio",
+			bosses = {"Princess Yauj", "Vem", "Lord Kri"}		
 		},
 		{
 			label = "Sartura",
@@ -1069,7 +1074,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["warrior tank"] = 1, 
 				["priest healer"] = 6,
 				["druid healer"] = 2,
-				["mage rangedps"] = 30,
+				["hunter rangedps"] = 30,
 			},
 			fullname = "Battleguard Sartura"
 		},
@@ -1112,7 +1117,8 @@ local function SetFactionPresets(factionName, factionGroup)
 				["mage rangedps"] = 14,
 				["rogue meleedps"] = 14,
 			},
-			fullname = "The Twin Emperors"
+			fullname = "The Twin Emperors",
+			bosses = {"Emperor Vek'lor", "Emperor Vek'nilash"}
 		},
 		{
 			label = "Ouro",
@@ -1305,6 +1311,7 @@ local function SetFactionPresets(factionName, factionGroup)
     regenerateTooltips()
     end
 end
+
 --------------------------------------------------------------------------------------------
 --------------------------dont edit below  this line----------------------------------------
 --------------------------------------------------------------------------------------------
