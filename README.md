@@ -62,14 +62,14 @@ This addon is an extension for the **PartyBot Command Panel (PCP)** for **World 
 ## 🛠️ Installation
 
 1. **Download the Addon:**  
-   - Clone this repository or download the ZIP file from GitHub.
+   - https://github.com/pumpan/FillRaidBots/releases/tag/v3.0.0
 
 2. **Extract Files:**  
    - Extract the contents to your WoW addons directory, typically located at:
      ```
      World of Warcraft/Interface/AddOns
      ```  
-   - Rename the folder to `FillRaidBots`.
+   - Make sure the folder name is `FillRaidBots`.
 
 3. **Enable the Addon:**  
    - Launch WoW and go to the AddOns menu from the character selection screen.  
