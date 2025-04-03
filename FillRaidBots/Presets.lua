@@ -81,6 +81,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["druid healer"] = 2,
 			},
 			fullname = "AbominationWing Thaddius"
+			bosses = {"Stalagg", "Feugen", "Thaddius"}			
 		},
 
 		{
@@ -569,7 +570,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["paladin healer"] = 2,
 				["warrior meleedps"] = 15,
 			},
-			fullname = "Jeklik"
+			fullname = "High Priestess Jeklik "
 		},
 		{
 			label = "Venoxis",
@@ -578,7 +579,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["paladin healer"] = 2,
 				["mage rangedps"] = 15,
 			},
-			fullname = "Venoxis"
+			fullname = "High Priest Venoxis "
 		},
 		{
 			label = "Mar'li",
@@ -587,7 +588,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["paladin healer"] = 2,
 				["warrior meleedps"] = 15,
 			},
-			fullname = "Mar'li"
+			fullname = "High Priestess Mar'li "
 		},
 		{
 			label = "Mandokir",
@@ -596,7 +597,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["paladin healer"] = 7,
 				["mage rangedps"] = 10,
 			},
-			fullname = "Mandokir"
+			fullname = "Bloodlord Mandokir"
 		},
 		{
 			label = "Thekal",
@@ -605,7 +606,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["paladin healer"] = 2,
 				["warrior meleedps"] = 15,
 			},
-			fullname = "Thekal"
+			fullname = "High Priest Thekal"
 		},
 		{
 			label = "Arlokk",
@@ -614,7 +615,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["paladin healer"] = 4,
 				["warrior meleedps"] = 14,
 			},
-			fullname = "Arlokk"
+			fullname = "High Priestess Arlokk"
 		},
 		{
 			label = "Jin'do",
@@ -623,7 +624,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["paladin healer"] = 5,
 				["warrior meleedps"] = 12,
 			},
-			fullname = "Jin'do"
+			fullname = "Jin'do the Hexxer"
 		},
 		{
 			label = "Hakkar",
@@ -632,7 +633,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["paladin healer"] = 5,
 				["rogue meleedps"] = 12,
 			},
-			fullname = "Hakkar"
+			fullname = "Hakkar the Soulflayer"
 		},
 	}
 
@@ -720,6 +721,7 @@ local function SetFactionPresets(factionName, factionGroup)
 
 			},
 			fullname = "Thaddius"
+			bosses = {"Stalagg", "Feugen", "Thaddius"}			
 		},
 
 		{
@@ -1208,7 +1210,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["shaman healer"] = 2,
 				["warrior meleedps"] = 15,
 			},
-			fullname = "Jeklik"
+			fullname = "High Priestess Jeklik"
 		},
 		{
 			label = "Venoxis",
@@ -1217,7 +1219,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 2,
 				["mage rangedps"] = 15,
 			},
-			fullname = "Venoxis"
+			fullname = "High Priest Venoxis"
 		},
 		{
 			label = "Mar'li",
@@ -1226,7 +1228,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["shaman healer"] = 2,
 				["warrior meleedps"] = 15,
 			},
-			fullname = "Mar'li"
+			fullname = "High Priestess Mar'li"
 		},
 		{
 			label = "Mandokir",
@@ -1235,7 +1237,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 7,
 				["mage rangedps"] = 10,
 			},
-			fullname = "Mandokir"
+			fullname = "Bloodlord Mandokir"
 		},
 		{
 			label = "Thekal",
@@ -1244,7 +1246,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["shaman healer"] = 2,
 				["warrior meleedps"] = 15,
 			},
-			fullname = "Thekal"
+			fullname = "High Priest Thekal"
 		},
 		{
 			label = "Arlokk",
@@ -1253,7 +1255,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["shaman healer"] = 4,
 				["warrior meleedps"] = 14,
 			},
-			fullname = "Arlokk"
+			fullname = "High Priestess Arlokk"
 		},
 		{
 			label = "Jin'do",
@@ -1262,7 +1264,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["shaman healer"] = 5,
 				["warrior meleedps"] = 12,
 			},
-			fullname = "Jin'do"
+			fullname = "Jin'do the Hexxer"
 		},
 		{
 			label = "Hakkar",
@@ -1271,7 +1273,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["shaman healer"] = 5,
 				["rogue meleedps"] = 12,
 			},
-			fullname = "Hakkar"
+			fullname = "Hakkar the Soulflayer"
 		},
 	}
 
