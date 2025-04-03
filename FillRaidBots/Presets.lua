@@ -80,7 +80,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["priest healer"] = 2,
 				["druid healer"] = 2,
 			},
-			fullname = "AbominationWing Thaddius"
+			fullname = "AbominationWing Thaddius",
 			bosses = {"Stalagg", "Feugen", "Thaddius"}			
 		},
 
@@ -720,7 +720,7 @@ local function SetFactionPresets(factionName, factionGroup)
 				["shaman healer"] = 8,
 
 			},
-			fullname = "Thaddius"
+			fullname = "Thaddius",
 			bosses = {"Stalagg", "Feugen", "Thaddius"}			
 		},
 
