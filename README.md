@@ -25,6 +25,22 @@
 
 This addon is an extension for the **PartyBot Command Panel (PCP)** for **World of Warcraft (WoW) 1.12.1**. It helps users efficiently fill a raid with bots and manage them through an intuitive command panel. The addon includes features for setting up bot configurations, managing presets for various dungeons and raids, and automating bot removal.
 
+## 🛠️ Installation
+
+1. **Download the Addon:**  
+   - https://github.com/pumpan/FillRaidBots/releases/tag/v3.0.0
+
+2. **Extract Files:**  
+   - Extract the contents to your WoW addons directory, typically located at:
+     ```
+     World of Warcraft/Interface/AddOns
+     ```  
+   - Make sure the folder name is `FillRaidBots`.
+
+3. **Enable the Addon:**  
+   - Launch WoW and go to the AddOns menu from the character selection screen.  
+   - Ensure that the addon is enabled in the list.
+
 ## ✨ Features
 
 - **Automated Interface Creation:**
@@ -65,21 +81,7 @@ This addon is an extension for the **PartyBot Command Panel (PCP)** for **World 
   <img src="/ScreenShots/frbsettings.png" alt="Settings Menu">
 </p>
 
-## 🛠️ Installation
 
-1. **Download the Addon:**  
-   - https://github.com/pumpan/FillRaidBots/releases/tag/v3.0.0
-
-2. **Extract Files:**  
-   - Extract the contents to your WoW addons directory, typically located at:
-     ```
-     World of Warcraft/Interface/AddOns
-     ```  
-   - Make sure the folder name is `FillRaidBots`.
-
-3. **Enable the Addon:**  
-   - Launch WoW and go to the AddOns menu from the character selection screen.  
-   - Ensure that the addon is enabled in the list.
 
 ## 🚀 Usage
 
