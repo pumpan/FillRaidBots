@@ -74,6 +74,21 @@ This addon is an extension for the **PartyBot Command Panel (PCP)** for **World 
 - **Loot Type Option:**
   - Automatically changes the loot type on raid creation to the selected one.
 
+- **Editable Presets (In-Game UI)**  
+  Raid composition presets can now be customized directly within the game.
+
+- **Editable Suppressed Bot Messages (In-Game UI)**  
+  Suppressed bot messages can now be managed and edited through the in-game interface.
+
+- **Auto Repair (VIP Only)**  
+  Automatically repairs your gear when visiting a vendor — available exclusively to VIP users.
+
+- **Auto Join Guild Option**  
+  Optionally join the *SoloCraft* guild automatically on login.
+
+- **Simplified Reload Command**  
+  Use `/reload`, `/rl`, or `/reloadui` to reload the UI — no need for `/console reloadui`.
+
 - **Settings Menu:**
   - Options to enable automatic dead bot removal and suppress bot messages for a cleaner interface.
 
@@ -127,11 +142,27 @@ The addon includes optimized presets for several dungeons and raids:
 
 ## 📝 Editing Presets or Suppress Bot Messages
 
-- To edit how often a message should be displayed, modify the `SuppressBotMsg.lua` file.
-- To add or change a preset, modify the `Presets.lua` file.
+- To edit how often a message should be displayed, modify the `Suppress` in the settings.
+- To add or change a preset, modify it under edit.
 
 
 ## 📅 Changelog
+
+**FillRaidBots 4.0.0**
+
+    🔄 Version updated to 4.0.0 — This update introduces major UI enhancements, in-game editing features, export/import options, and improved bot handling. It's a substantial quality-of-life release deserving of a full version bump.
+    
+    🆕 Added: Editable raid composition presets directly within the in-game UI.
+    🆕 Added: In-game UI for managing suppressed bot messages.
+    🆕 Added: Export/import support for presets and suppressed messages across accounts.
+    🆕 Added: Auto Repair feature (VIP only). Repairs your gear automatically at vendors.
+    🆕 Added: Option to auto-join the SoloCraft guild.
+    🆕 Added: Simplified reload command — use /reload, /rl, or /reloadui.
+    🆕 Added: Party bot logic—groups with fewer than 5 bots stay as a party, ideal for leveling.
+    🆕 Added: More accurate "Raid Filling Complete" message, reflecting the true raid state.
+    🆕 Added: Escape key now properly closes the FillRaid UI.
+    🆕 Added: Faction-based class filtering (e.g., hides Paladins for Horde, Shamans for Alliance).
+    🆕 Added: Class headers in the UI for better visual organization (e.g., Warriors, Mages).
 
 **FillRaidBots 3.0.0**
 
