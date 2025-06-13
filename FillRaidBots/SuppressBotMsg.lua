@@ -1,27 +1,37 @@
+function SuppressBotMsg()
 
-messagesToHide = {
-  ["New party bot added."] = 0, 
-  ["All party bots are casting AoE spells at"] = 10, 
-  ["All party bots are now attacking"] = 60,
-  ["coming to your position."] = 60, 
-  ["has joined the raid group"] = 60,
-  ["joins the party."] = 0,
-  ["Cannot add more bots. Instance is full."] = 60,  
-  ["You should select a character or a creature."] = 60,    
-  ["All party bots unpaused."] = 60,
-  ["DPS will join in 30 seconds!"] = 60,  
-  ["unpaused"] = 60,
-  ["staying."] = 60,  
-  ["has left the raid group"] = 60,
-  ["All bots are moving."] = 60,  
-  ["is moving"] = 60,  
-  ["is not a party bot."] = 0,    
-  ["gameobjects found!"] = 60,    
-  ["used the object."] = 60, 
-  ["in range of the object."] = 60,   
-  ["is appearing to your location."] = 60,
-  ["is not in your party."] = 60, 
-  ["You have joined a raid group."] = 0, 
-  ["You have left the raid group."] = 0,   
-  ["All party bots are now attacking"] = 5 
-}
+	if FillRaidSuppressBotMsg == nil then
+		FillRaidSuppressBotMsg = {}
+	end
+
+
+	if not FillRaidSuppressBotMsg.messagesToHide then
+		FillRaidSuppressBotMsg.messagesToHide = {
+			["has come online."] = 0,
+			["has gone offline."] = 0,
+			["New party bot added."] = 0,
+			["All party bots are casting AoE spells at"] = 10,
+			["All party bots are now attacking"] = 60,
+			["coming to your position."] = 60,
+			["has joined the raid group"] = 60,
+			["joins the party."] = 60,
+			["All party bots unpaused."] = 60,
+			["DPS will join in 30 seconds!"] = 60,
+			["unpaused"] = 60,
+			["staying."] = 60,
+			["has left the raid group"] = 60,
+			["All bots are moving."] = 60,
+			["is moving"] = 60,
+			["No valid target"] = 0,
+		}
+
+		QueueDebugMessage("INFO: Loaded default Suppress message settings.", "debuginfo")
+	else
+		QueueDebugMessage("INFO: Loaded saved Suppress message settings from SavedVariables.", "debuginfo")
+	end
+end
+local SuppressBotMsgLoadOnEventFrame = CreateFrame("Frame")
+SuppressBotMsgLoadOnEventFrame:RegisterEvent("PLAYER_LOGIN")
+SuppressBotMsgLoadOnEventFrame:SetScript("OnEvent", function()
+    SuppressBotMsg()
+end)
