@@ -20,7 +20,7 @@ local classes = {
 }
 local addonName = "FillRaidBots"
 local addonPrefix = "FillRaidBotsVersion"
-local versionNumber = "4.0.0"
+local versionNumber = "4.0.1"
 local a = "4"
 local botCount = 0
 local initialBotRemoved = false
@@ -659,13 +659,18 @@ local function normalizePlayerName(playerName)
     if type(playerName) ~= "string" then
         return nil
     end
+
     local cleanName = ""
     for i = 1, string.len(playerName) do
-        local char = string.sub(playerName, i, i) 
-        if (char >= "a" and char <= "z") or (char >= "A" and char <= "Z") or (char >= "0" and char <= "9") then
-            cleanName = cleanName .. string.lower(char) 
+        local char = string.sub(playerName, i, i)
+        if (char >= "a" and char <= "z") or 
+           (char >= "A" and char <= "Z") or 
+           (char >= "0" and char <= "9") or 
+           char == "*" then
+            cleanName = cleanName .. string.lower(char)
         end
     end
+
     return cleanName
 end
 
@@ -1076,176 +1081,186 @@ local guildDeadStatus = {}
 
 
 local function CheckAndRemoveDeadBots()
-    if not FillRaidBotsSavedSettings or not FillRaidBotsSavedSettings.isCheckAndRemoveEnabled then
-        return
-    end
+	if not FillRaidBotsSavedSettings or not FillRaidBotsSavedSettings.isCheckAndRemoveEnabled then
+		return
+	end
 
-    local playerName = UnitName("player")
+	local playerName = UnitName("player")
 
-    if not (IsRaidLeader() or IsRaidOfficer()) and GetNumRaidMembers() > 0 then
-        if not hasWarnedNoPermission then
-            QueueDebugMessage("WARNING: You must be a raid leader or officer to remove bots.", "debuginfo")
-            hasWarnedNoPermission = true
-        end
-        return
-    end
-    hasWarnedNoPermission = false
+	if not (IsRaidLeader() or IsRaidOfficer()) and GetNumRaidMembers() > 0 then
+		if not hasWarnedNoPermission then
+			QueueDebugMessage("WARNING: You must be a raid leader or officer to remove bots.", "debuginfo")
+			hasWarnedNoPermission = true
+		end
+		return
+	end
+	hasWarnedNoPermission = false
 
-    local function buildGuildRoster()
-        local guildMembers = {}
-        for j = 1, GetNumGuildMembers() do
-            local guildName = GetGuildRosterInfo(j)
-            if guildName then
-                guildMembers[guildName] = true
-            end
-        end
-        return guildMembers
-    end
+	local function buildGuildRoster()
+		local guildMembers = {}
+		for j = 1, GetNumGuildMembers() do
+			local guildName = GetGuildRosterInfo(j)
+			if guildName then
+				guildMembers[guildName] = true
+			end
+		end
+		return guildMembers
+	end
 
-    local function buildFriendList()
-        local friends = {}
-        for i = 1, GetNumFriends() do
-            local name, _, _, _, online = GetFriendInfo(i)
-            if name and online then
-                friends[name] = true  
-            end
-        end
-        return friends
-    end
+	local function buildFriendList()
+		local friends = {}
+		for i = 1, GetNumFriends() do
+			local name, _, _, _, online = GetFriendInfo(i)
+			if name and online then
+				friends[name] = true
+			end
+		end
+		return friends
+	end
 
-    if GetNumRaidMembers() > 0 then
-        if GetNumRaidMembers() > 2 then
-            for i = 1, GetNumRaidMembers() do
-                local name, _, _, _, _, _, _, _, isDead = GetRaidRosterInfo(i)
-                local unit = "raid" .. i
 
-                if UnitExists(unit) then
-                    name = name or UnitName(unit)  
-                    if name then
-                        local guildMembers = buildGuildRoster()
-                        local friends = buildFriendList()
+	local function isBotName(name)
+		return string.find(name or "", "%*") ~= nil
+	end
 
-                        if isDead and not UnitIsGhost(unit) then
-                            if guildMembers[name] then
-                                if not guildDeadStatus[name] then
-                                    QueueDebugMessage("INFO: STOPPED FROM KICKING GUILD MEMBER.", "debuginfo")
-                                    guildDeadStatus[name] = true
-                                end
-                            elseif friends[name] then
-                                if not guildDeadStatus[name] then
-                                    QueueDebugMessage("INFO: STOPPED FROM KICKING FRIEND: " .. name, "debuginfo")
-                                    guildDeadStatus[name] = true
-                                end
+	if GetNumRaidMembers() > 0 then
+		if GetNumRaidMembers() > 2 then
+			for i = 1, GetNumRaidMembers() do
+				local name, _, _, _, _, _, _, _, isDead = GetRaidRosterInfo(i)
+				local unit = "raid" .. i
+
+				if UnitExists(unit) then
+					name = name or UnitName(unit)
+					if name then
+						local guildMembers = buildGuildRoster()
+						local friends = buildFriendList()
+
+						if isDead and not UnitIsGhost(unit) then
+							if guildMembers[name] then
+								if not guildDeadStatus[name] then
+									QueueDebugMessage("INFO: STOPPED FROM KICKING GUILD MEMBER.", "debuginfo")
+									guildDeadStatus[name] = true
+								end
+							elseif friends[name] then
+								if not guildDeadStatus[name] then
+									QueueDebugMessage("INFO: STOPPED FROM KICKING FRIEND: " .. name, "debuginfo")
+									guildDeadStatus[name] = true
+								end
 							elseif not UnitIsConnected(unit) then
-								QueueDebugMessage("INFO: CANNOT KICK OFFLINE UNIT: " .. name, "debuginfo")	
-                            else
-                                UninviteMember(name, "dead")
-                            end
-                        else
-                            guildDeadStatus[name] = nil
-                        end
-                    else
-                        QueueDebugMessage("DEBUG: Name is nil for raid unit: " .. unit, "error")
-                    end
-                end
-            end
-            messagecantremove = false
-        elseif not messagecantremove then
-            QueueDebugMessage("INFO: Saving the last bot so the raid does not disband.", "debuginfo")
-            messagecantremove = true
-        end
-    elseif GetNumPartyMembers() > 0 then
-        for i = 1, GetNumPartyMembers() do
-            local unit = "party" .. i
-            local name = UnitName(unit)
+								QueueDebugMessage("INFO: CANNOT KICK OFFLINE UNIT: " .. name, "debuginfo")
+							elseif isBotName(name) then
+								UninviteMember(name, "dead")
+							else
+								QueueDebugMessage("INFO: Skipping real player: " .. name, "debuginfo")
+							end
+						else
+							guildDeadStatus[name] = nil
+						end
+					else
+						QueueDebugMessage("DEBUG: Name is nil for raid unit: " .. unit, "error")
+					end
+				end
+			end
+			messagecantremove = false
+		elseif not messagecantremove then
+			QueueDebugMessage("INFO: Saving the last bot so the raid does not disband.", "debuginfo")
+			messagecantremove = true
+		end
+	elseif GetNumPartyMembers() > 0 then
+		for i = 1, GetNumPartyMembers() do
+			local unit = "party" .. i
+			local name = UnitName(unit)
 
-            if UnitExists(unit) then
-                name = name or UnitName(unit)  
-                if name then
-                    local guildMembers = buildGuildRoster()
-                    local friends = buildFriendList()
+			if UnitExists(unit) then
+				name = name or UnitName(unit)
+				if name then
+					local guildMembers = buildGuildRoster()
+					local friends = buildFriendList()
 
-                    if UnitIsDead(unit) and not UnitIsGhost(unit) then
-                        if guildMembers[name] then
-                            if not guildDeadStatus[name] then
-                                QueueDebugMessage("INFO: STOPPED FROM KICKING GUILD MEMBER.", "debuginfo")
-                                guildDeadStatus[name] = true
-                            end
-                        elseif friends[name] then
-                            if not guildDeadStatus[name] then
-                                QueueDebugMessage("INFO: STOPPED FROM KICKING FRIEND: " .. name, "debuginfo")
-                                guildDeadStatus[name] = true
-                            end
-                        else
-                            UninviteMember(name, "dead")
-                        end
-                    else
-                        guildDeadStatus[name] = nil
-                    end
-                else
-                    QueueDebugMessage("DEBUG: Name is nil for party unit: " .. unit, "error")
-                end
-            end
-        end
-    end
+					if UnitIsDead(unit) and not UnitIsGhost(unit) then
+						if guildMembers[name] then
+							if not guildDeadStatus[name] then
+								QueueDebugMessage("INFO: STOPPED FROM KICKING GUILD MEMBER.", "debuginfo")
+								guildDeadStatus[name] = true
+							end
+						elseif friends[name] then
+							if not guildDeadStatus[name] then
+								QueueDebugMessage("INFO: STOPPED FROM KICKING FRIEND: " .. name, "debuginfo")
+								guildDeadStatus[name] = true
+							end
+						elseif isBotName(name) then
+							UninviteMember(name, "dead")
+						else
+							QueueDebugMessage("INFO: Skipping real player: " .. name, "debuginfo")
+						end
+					else
+						guildDeadStatus[name] = nil
+					end
+				else
+					QueueDebugMessage("DEBUG: Name is nil for party unit: " .. unit, "error")
+				end
+			end
+		end
+	end
 end
-
-
-
-
-
 
 
 local function SaveRaidMembersAndSetFirstBot()
-    local raidMembers = {}
-    local playerName = UnitName("player")
-    firstBotName = nil
+	local raidMembers = {}
+	local playerName = UnitName("player")
+	firstBotName = nil
 
-    
-    local guildMembers = {}
-    for i = 1, GetNumGuildMembers() do
-        local name = GetGuildRosterInfo(i)
-        if name then
-            guildMembers[name] = true
-        end
-    end
 
-    
-    local friends = {}
-    for i = 1, GetNumFriends() do
-        local name, _, _, _, online = GetFriendInfo(i)
-        if name and online then
-            friends[name] = true  
-        end
-    end
+	local guildMembers = {}
+	for i = 1, GetNumGuildMembers() do
+		local name = GetGuildRosterInfo(i)
+		if name then
+			guildMembers[name] = true
+		end
+	end
 
-    
-    for i = 1, GetNumRaidMembers() do
-        local unit = "raid" .. i
-        local name = UnitName(unit)
 
-        if name and name ~= playerName then
-            
-            if guildMembers[name] then
-                QueueDebugMessage("INFO: " .. name .. " is a member of a guild, skipping!", "debuginfo")
-            elseif friends[name] then
-                QueueDebugMessage("INFO: " .. name .. " is a friend, skipping!", "debuginfo")
-            else
-                
-                if not firstBotName then
-                    firstBotName = name
-                    QueueDebugMessage("INFO: First raid bot set to: " .. firstBotName, "debuginfo")
-                end
-                table.insert(raidMembers, name)
-            end
-        end
-    end
+	local friends = {}
+	for i = 1, GetNumFriends() do
+		local name, _, _, _, online = GetFriendInfo(i)
+		if name and online then
+			friends[name] = true
+		end
+	end
 
-    
-    if not firstBotName then
-        QueueDebugMessage("ERROR: No first Bot found", "debugerror")
-    end
+
+	local function isBotName(name)
+		return string.find(name or "", "%*") ~= nil
+	end
+
+
+	for i = 1, GetNumRaidMembers() do
+		local unit = "raid" .. i
+		local name = UnitName(unit)
+
+		if name and name ~= playerName then
+			if guildMembers[name] then
+				QueueDebugMessage("INFO: " .. name .. " is a member of a guild, skipping!", "debuginfo")
+			elseif friends[name] then
+				QueueDebugMessage("INFO: " .. name .. " is a friend, skipping!", "debuginfo")
+			elseif isBotName(name) then
+			
+				if not firstBotName then
+					firstBotName = name
+					QueueDebugMessage("INFO: First raid bot set to: " .. firstBotName, "debuginfo")
+				end
+				table.insert(raidMembers, name)
+			else
+				QueueDebugMessage("INFO: " .. name .. " is not marked as a bot (no *), skipping!", "debuginfo")
+			end
+		end
+	end
+
+	if not firstBotName then
+		QueueDebugMessage("ERROR: No first bot found (only real players detected)", "debugerror")
+	end
 end
+
 
 
 
@@ -1368,7 +1383,6 @@ local function GetSelectedLootMethod()
     elseif AutoMasterLootCheckButton:GetChecked() then
         return "master"
     end
-    return "freeforall" 
 end
 
 local originalSoundVolume = nil
@@ -3671,6 +3685,7 @@ local creditsData = {
     {name = "|cffffd700Pumpan|r", contribution = "Creator of the addon"},
     {name = "|cffffd700Dedirtyone|r", contribution = "Special thanks to Dedirtyone for his incredible generosity\nin donating €50 to help me get VIP status.\nYour support means so much and has truly motivated me \nto keep contributing to the community. \nThis addon wouldn’t be the same without people like you!"},
 	{name = "|cffffd700TheSamurai206|r", contribution = "A huge thank you to TheSamurai206 (Zugginator) for his generous donation of €20.\nYour support means a lot and helps me continue improving this addon.\nIt's supporters like you that keep this project going!"},
+	{name = "|cffffd700Spinach|r", contribution = "A heartfelt thank you to Spinach for the generous €20 donation.\nYour support truly means a lot and motivates me to keep improving this addon.\nAmazing supporters like you are what keep this project alive!"},
     {name = "|cffffffffGemma|r", contribution = "Thanks for Beta testing, and bug reports!"},
     {name = "|cffffffffTO EVERYONE ELSE!|r", contribution = "To everyone who has been supporting! \nIf you are interested in contributing in any way, \nbug reporting, beta testing, or whatever, \nplease contact me on the forum, Discord, or in-game."},
 }
@@ -4497,64 +4512,71 @@ end
 
 
 function UninviteAllRaidMembers()
-    local myName = UnitName("player")
-    initialBotRemoved = false
-    firstBotName = nil
-    botCount = 0    
+	local myName = UnitName("player")
+	initialBotRemoved = false
+	firstBotName = nil
+	botCount = 0    
 
-    
-    local guildMembers = {}
-    for i = 1, GetNumGuildMembers() do
-        local name = GetGuildRosterInfo(i)
-        if name and name ~= myName then
-            guildMembers[name] = true
-        end
-    end
 
-    
-    local friends = {}
-    for i = 1, GetNumFriends() do
-        local name, _, _, _, online = GetFriendInfo(i)
-        if name and online then
-            friends[name] = true
-        end
-    end
+	local guildMembers = {}
+	for i = 1, GetNumGuildMembers() do
+		local name = GetGuildRosterInfo(i)
+		if name and name ~= myName then
+			guildMembers[name] = true
+		end
+	end
 
-    
-    local startIndex = 2
-    for i = 1, GetNumRaidMembers() do
-        local unit = "raid" .. tostring(i)
-        local name = UnitName(unit)
-        if name and (guildMembers[name] or friends[name]) then
-            startIndex = 1
-            break 
-        end
-    end
 
-    
-    for i = startIndex, GetNumRaidMembers() do
-        local unit = "raid" .. tostring(i)
-        local name = UnitName(unit)
-        if name then
-            if name == myName then
-                QueueDebugMessage("INFO: Kept " .. name .. " because it's you.", "debugremove")
-            elseif guildMembers[name] then
-                QueueDebugMessage("INFO: Kept " .. name .. " because they are in your guild.", "debugremove")
-            elseif friends[name] then
-                QueueDebugMessage("INFO: Kept " .. name .. " because they are your friend.", "debugremove")
-            else
-                QueueDebugMessage("REMOVING: " .. name .. " because they are not in your guild or friends list.", "debugremove")
-                UninviteByName(name)
-            end
-        else
-            QueueDebugMessage("ERROR: Skipped uninviting an unknown or nil player at raid slot " .. i, "debugremove")
-        end
-    end
+	local friends = {}
+	for i = 1, GetNumFriends() do
+		local name, _, _, _, online = GetFriendInfo(i)
+		if name and online then
+			friends[name] = true
+		end
+	end
+
+
+	local function isBotName(name)
+		return string.find(name or "", "%*") ~= nil
+	end
+
+
+	local startIndex = 2
+	for i = 1, GetNumRaidMembers() do
+		local unit = "raid" .. tostring(i)
+		local name = UnitName(unit)
+		if name and (guildMembers[name] or friends[name]) then
+			startIndex = 1
+			break
+		end
+	end
+
+
+	for i = startIndex, GetNumRaidMembers() do
+		local unit = "raid" .. tostring(i)
+		local name = UnitName(unit)
+		if name then
+			if name == myName then
+				QueueDebugMessage("INFO: Kept " .. name .. " because it's you.", "debugremove")
+			elseif guildMembers[name] then
+				QueueDebugMessage("INFO: Kept " .. name .. " because they are in your guild.", "debugremove")
+			elseif friends[name] then
+				QueueDebugMessage("INFO: Kept " .. name .. " because they are your friend.", "debugremove")
+			elseif isBotName(name) then
+				QueueDebugMessage("REMOVING BOT: " .. name .. " (not a guildie or friend).", "debugremove")
+				UninviteByName(name)
+			else
+				QueueDebugMessage("SKIPPED: " .. name .. " (real player, no * in name).", "debugremove")
+			end
+		else
+			QueueDebugMessage("ERROR: Skipped uninviting an unknown or nil player at raid slot " .. i, "debugremove")
+		end
+	end
 end
 
 
 
-local c = "0"
+local c = "1"
 
 SLASH_FRB1 = "/frb"
 SlashCmdList["FRB"] = function(cmd)
