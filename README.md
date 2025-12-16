@@ -27,7 +27,7 @@ This addon is an extension for the **PartyBot Command Panel (PCP)** for **World 
 ## 🛠️ Installation
 
 1. **Download the Addon:**  
-   [![⬇ DOWNLOAD](https://img.shields.io/github/downloads/pumpan/FillRaidBots/total?style=for-the-badge&color=00b4d8&label=⬇+DOWNLOAD)](https://github.com/pumpan/FillRaidBots/releases)
+  👉👉👉 [![⬇ DOWNLOAD](https://img.shields.io/github/downloads/pumpan/FillRaidBots/total?style=for-the-badge&color=00b4d8&label=⬇+DOWNLOAD)](https://github.com/pumpan/FillRaidBots/releases) 👈👈👈
 
 
 2. **Extract Files:**  
@@ -40,6 +40,9 @@ This addon is an extension for the **PartyBot Command Panel (PCP)** for **World 
 3. **Enable the Addon:**  
    - Launch WoW and go to the AddOns menu from the character selection screen.  
    - Ensure that the addon is enabled in the list.
+
+4. **Having installation issues?**
+   - 📘 [How to install addons](https://github.com/pumpan/howtoinstalladdons/wiki)
 
 ## ✨ Features
 
