@@ -173,7 +173,7 @@ logLevelButton:SetScript("OnLeave", function()
 end)
 
 logLevelButton:SetScript("OnClick", function()
-        print("Log Level button clicked!")
+        DEFAULT_CHAT_FRAME:AddMessage("Log Level button clicked!")
 end)
 
 
@@ -247,7 +247,7 @@ end
 function DebugMessage(message, level)
     if not IsLogLevelEnabled(level) then return end
 
-        	local timestampedMessage = "[" .. message
+        	local timestampedMessage = "[" .. GetTimestamp() .. "] " .. message
         table.insert(debugMessages, timestampedMessage)
 
         if table.getn(debugMessages) > maxMessages then
@@ -265,10 +265,10 @@ SLASH_FILLRAIDBOTSDEBUG1 = "/frbdebug"
 SlashCmdList["FILLRAIDBOTSDEBUG"] = function()
     if debuggerFrame:IsShown() then
         debuggerFrame:Hide()
-        print("FillRaidBots Debugger Frame hidden.")
+        DEFAULT_CHAT_FRAME:AddMessage("FillRaidBots Debugger Frame hidden.")
     else
         debuggerFrame:Show()
-        print("FillRaidBots Debugger Frame shown.")
+        DEFAULT_CHAT_FRAME:AddMessage("FillRaidBots Debugger Frame shown.")
     end
 end
 

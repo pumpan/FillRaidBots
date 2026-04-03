@@ -4,33 +4,11 @@
 ----------------------------------------------------------------------------------------------------
 
 
-local function generateTooltip(values)
-    local tooltipParts = {}
-    for role, count in pairs(values) do
-        table.insert(tooltipParts, count .. " " .. role)
-    end
-    return table.concat(tooltipParts, ", ")
-end
 
-
-local function regenerateTooltips()
-    
-    local presetTables = {naxxramasPresets, bwlPresets, mcPresets, onyxiaPresets, aq40Presets, aq20Presets, ZGPresets, otherPresets}
-
-    
-    for _, presets in ipairs(presetTables) do
-        for _, preset in ipairs(presets) do
-            local name = preset.fullname or preset.label  
-            preset.tooltip = name .. " (" .. generateTooltip(preset.values) .. ")"  
-        end
-    end
-end
-
-
 if not FillRaidPresets then
     FillRaidPresets = {}
 end
-
+
 naxxramasPresets = {}
 bwlPresets = {}
 mcPresets = {}
@@ -40,7 +18,7 @@ aq20Presets = {}
 ZGPresets = {}
 otherPresets = {}
 
--------------------------------------------------------
+-------------------------------------------------------
 -------------------------------------------------------
 local function generateTooltip(values)
     local tooltipParts = {}
@@ -70,7 +48,7 @@ local function regenerateTooltips()
     end
 end
 
--------------------------------------------------------
+-------------------------------------------------------
 -------------------------------------------------------
 local function SetFactionPresets(factionName, factionGroup)
     DEFAULT_CHAT_FRAME:AddMessage("Your faction: " .. factionGroup)
@@ -796,7 +774,7 @@ local function SetFactionPresets(factionName, factionGroup)
 	regenerateTooltips()
 end
 
--------------------------------------------------------
+-------------------------------------------------------
 -------------------------------------------------------
 local function CheckFaction()
     local factionName, factionGroup = UnitFactionGroup("player")
@@ -816,7 +794,7 @@ local function CheckFaction()
     instanceFrames["PresetDungeounOther"] = CreateInstanceFrame("PresetDungeounOther", otherPresets)
 end
 
--------------------------------------------------------
+-------------------------------------------------------
 -------------------------------------------------------
 SLASH_CHECKFACTION1 = "/checkfaction"
 SlashCmdList["CHECKFACTION"] = function()
