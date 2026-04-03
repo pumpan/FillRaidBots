@@ -117,7 +117,7 @@ botMessagesCheckButton.text:SetPoint("LEFT", botMessagesCheckButton, "RIGHT", 5,
 botMessagesCheckButton.text:SetText("Suppress Messages")
 
 botMessagesCheckButton:SetChecked(FillRaidBotsSavedSettings.isBotMessagesEnabled)
-
+
 local SuppressEditorButton = CreateFrame("Button", nil, UISettingsFrame, "GameMenuButtonTemplate")
 SuppressEditorButton:SetText("Suppress")
 SuppressEditorButton:SetWidth(80)
@@ -139,13 +139,13 @@ SuppressEditorButton:SetScript("OnClick", function()
         SuppressEditor:Show()
     end
 end)
-
+
 if FillRaidBotsSavedSettings.isBotMessagesEnabled then
     SuppressEditorButton:Enable()
 else
     SuppressEditorButton:Disable()
 end
-
+
 botMessagesCheckButton:SetScript("OnClick", function()
     local isChecked = this:GetChecked()
     FillRaidBotsSavedSettings.isBotMessagesEnabled = isChecked
@@ -293,7 +293,7 @@ end)
 
     AutoMuteSoundCheckButton:SetScript("OnEnter", function()
         GameTooltip:SetOwner(AutoMuteSoundCheckButton, "ANCHOR_RIGHT")
-        GameTooltip:SetText("When enabled, will lower Sound effects \nautomaticaly while filling raid.")
+        GameTooltip:SetText("When enabled, will lower Sound effects \nautomatically while filling raid.")
         GameTooltip:Show()
     end)
     AutoMuteSoundCheckButton:SetScript("OnLeave", function()
@@ -392,12 +392,12 @@ end)
     end)
    local LootType, mainSeparator = CreateUISectionHeader(UISettingsFrame, SmallCheckButton, "Loot Type", 0, -20)	
    
------------------------------------------auto loot option --------------------------------
+-----------------------------------------auto loot option --------------------------------
 
-
+
 local checkboxYOffset = -270 
 
-
+
 local AutoFFACheckButton = CreateFrame("CheckButton", "AutoFFACheckButton", UISettingsFrame, "UICheckButtonTemplate")
 AutoFFACheckButton:SetHeight(20)
 AutoFFACheckButton:SetWidth(20)
@@ -413,13 +413,13 @@ AutoFFACheckButton:SetPoint("TOPLEFT", LootType, "TOPLEFT", 10, -40)
 local AutoFFAText = UISettingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 AutoFFAText:SetPoint("BOTTOM", AutoFFACheckButton, "TOP", 0, 2)
 AutoFFAText:SetText("FFA")
-
+
 local AutoGroupLootCheckButton = CreateFrame("CheckButton", "AutoGroupLootCheckButton", UISettingsFrame, "UICheckButtonTemplate")
 AutoGroupLootCheckButton:SetHeight(20)
 AutoGroupLootCheckButton:SetWidth(20)
 AutoGroupLootCheckButton:SetPoint("LEFT", AutoFFACheckButton, "RIGHT", 40, 0)
     AutoGroupLootCheckButton:SetScript("OnEnter", function()
-        GameTooltip:SetOwner(AutoFFACheckButton, "ANCHOR_RIGHT")
+        GameTooltip:SetOwner(AutoGroupLootCheckButton, "ANCHOR_RIGHT")
         GameTooltip:SetText("When enabled, puts Group loot automatically on raid creation")
         GameTooltip:Show()
     end)
@@ -429,13 +429,13 @@ AutoGroupLootCheckButton:SetPoint("LEFT", AutoFFACheckButton, "RIGHT", 40, 0)
 local AutoGroupLootText = UISettingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 AutoGroupLootText:SetPoint("BOTTOM", AutoGroupLootCheckButton, "TOP", 0, 2)
 AutoGroupLootText:SetText("Group")
-
+
 local AutoMasterLootCheckButton = CreateFrame("CheckButton", "AutoMasterLootCheckButton", UISettingsFrame, "UICheckButtonTemplate")
 AutoMasterLootCheckButton:SetHeight(20)
 AutoMasterLootCheckButton:SetWidth(20)
 AutoMasterLootCheckButton:SetPoint("LEFT", AutoGroupLootCheckButton, "RIGHT", 40, 0)
     AutoMasterLootCheckButton:SetScript("OnEnter", function()
-        GameTooltip:SetOwner(AutoFFACheckButton, "ANCHOR_RIGHT")
+        GameTooltip:SetOwner(AutoMasterLootCheckButton, "ANCHOR_RIGHT")
         GameTooltip:SetText("When enabled, puts Master loot automatically on raid creation")
         GameTooltip:Show()
     end)
@@ -445,13 +445,13 @@ AutoMasterLootCheckButton:SetPoint("LEFT", AutoGroupLootCheckButton, "RIGHT", 40
 local AutoMasterLootText = UISettingsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 AutoMasterLootText:SetPoint("BOTTOM", AutoMasterLootCheckButton, "TOP", 0, 2)
 AutoMasterLootText:SetText("Master")
-
+
 local function SetLootOption(selectedLootType)
     AutoFFACheckButton:SetChecked(selectedLootType == "freeforall")
     AutoGroupLootCheckButton:SetChecked(selectedLootType == "group")
     AutoMasterLootCheckButton:SetChecked(selectedLootType == "master")
 end
-
+
 AutoFFACheckButton:SetScript("OnClick", function(self)
     SetLootOption("freeforall")
     DEFAULT_CHAT_FRAME:AddMessage("Loot Method set to |cFF00FF00Free-for-All|r")
@@ -501,7 +501,7 @@ end)
     end)
 
 
-
+
 if FillRaidBotsSavedSettings.isFFAEnabled then
     SetLootOption("freeforall")
 elseif FillRaidBotsSavedSettings.isGroupLootEnabled then
