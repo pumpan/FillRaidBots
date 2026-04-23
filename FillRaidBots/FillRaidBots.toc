@@ -5,5 +5,6 @@
 Debugger.lua
 SuppressBotMsg.lua
 UISettings.lua
+Tutorials.lua
 Presets.lua
 FillRaidBots.xml
