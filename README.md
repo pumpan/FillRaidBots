@@ -187,8 +187,8 @@ Configure bots directly before filling:
 - Saved directly in presets
 
 <p align="center">
-  <img src="/ScreenShots/totems.png" width="100">
-  <img src="/ScreenShots/blessings.png" width="100">
+  <img src="/ScreenShots/totems.png" width="200">
+  <img src="/ScreenShots/blessings.png" width="200">
 </p>
 ---
 
