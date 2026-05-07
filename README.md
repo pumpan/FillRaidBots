@@ -353,6 +353,23 @@ The addon includes optimized presets for several dungeons and raids:
 
 ## 📅 Changelog
 
+### **FillRaidBots 5.1.0**
+
+- Advanced Paladin/Shaman/Mage configuration system  
+- Paladin blessing assignment UI  
+- Shaman totem assignment UI  
+- Mage Frost/Fire spec system  
+- 50/50 Mage spec mode  
+- Copy/Paste Shaman setups  
+- Role icons in bot configuration UI  
+- Improved preset botSettings saving/loading  
+- Moveable bot configuration windows  
+- ESC support for configuration frames  
+- Improved Classic (1.12.1) compatibility  
+- Better spell tooltips and icon handling  
+- Added support for "all" zone presets  
+- Multiple UI and preset system fixes
+
 ### **FillRaidBots 5.0.0**
 🆕 Major Changes (From Old Version)
 
