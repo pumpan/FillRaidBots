@@ -537,7 +537,7 @@ FillRaidTutorialLinks['Lucifron'] = {
             { label = "Vandramio", url = "https://www.youtube.com/watch?v=P67B7C7eb7g" },
         },
         vip = {
-            
+			{ label = "Odium", url = "https://youtu.be/yoOY6HSDw8A" },            
         },
     },
 }
@@ -558,7 +558,7 @@ FillRaidTutorialLinks['Magmadar'] = {
             { label = "Wowmantrav", url = "https://www.youtube.com/watch?v=UXDQjotBfJo&list=PLuZTM2O8dt2kleI2VATFJRmcjPPKcsfKZ&index=1" },
         },
         vip = {
-            
+			{ label = "Odium", url = "https://youtu.be/Svl956X5rXE" },            
         },
     },
 }
@@ -579,7 +579,7 @@ FillRaidTutorialLinks['Gehennas'] = {
             { label = "Wowmantrav", url = "https://www.youtube.com/watch?v=qvTjsD3tQXk&list=PLuZTM2O8dt2kleI2VATFJRmcjPPKcsfKZ&index=2" },
         },
         vip = {
-            
+			{ label = "Odium", url = "https://youtu.be/1Onzz3x7-Oo" },
         },
     },
 }
@@ -601,6 +601,7 @@ FillRaidTutorialLinks['Garr'] = {
         },
         vip = {
             { label = "Wowmantrav", url = "https://www.youtube.com/watch?v=5_gMLEKc5hI&list=PLuZTM2O8dt2kleI2VATFJRmcjPPKcsfKZ&index=4" },
+			{ label = "Odium", url = "https://youtu.be/Kdy4DRpbXwI" },			
         },
     },
 }
@@ -620,7 +621,7 @@ FillRaidTutorialLinks['Baron Geddon'] = {
             { label = "Wowmantrav", url = "https://www.youtube.com/watch?v=BosD88nCurk&list=PLuZTM2O8dt2kleI2VATFJRmcjPPKcsfKZ&index=5" },
         },
         vip = {
-            
+			{ label = "Odium", url = "https://youtu.be/-xpGuIfalhY" },            
         },
     },
 }
@@ -640,7 +641,7 @@ FillRaidTutorialLinks['Shazzrah'] = {
             { label = "Wowmantrav", url = "https://www.youtube.com/watch?v=6iATl3I-Ul4&list=PLuZTM2O8dt2kleI2VATFJRmcjPPKcsfKZ&index=3" },
         },
         vip = {
-            
+			{ label = "Odium", url = "https://youtu.be/6KNR09MWwT8" },            
         },
     },
 }
@@ -660,7 +661,7 @@ FillRaidTutorialLinks['Sulfuron Harbinger'] = {
             { label = "Vandramio", url = "https://www.youtube.com/watch?v=ZwtjZF9bqRc" },
         },
         vip = {
-            
+			{ label = "Odium", url = "https://youtu.be/ekSjHvHtxd4" },            
         },
     },
 }
@@ -681,7 +682,7 @@ FillRaidTutorialLinks['Golemagg the Incinerator'] = {
             { label = "Wowmantrav", url = "https://www.youtube.com/watch?v=ay36KbZxqsw&list=PLuZTM2O8dt2kleI2VATFJRmcjPPKcsfKZ&index=6" },
         },
         vip = {
-            
+			{ label = "Odium", url = "https://youtu.be/S-1Sq82YuIc" },            
         },
     },
 }
@@ -702,7 +703,7 @@ FillRaidTutorialLinks['Majordomo Executus'] = {
             { label = "Wowmantrav", url = "https://www.youtube.com/watch?v=v8gY4EPJq5g&list=PLuZTM2O8dt2kleI2VATFJRmcjPPKcsfKZ&index=7" },
         },
         vip = {
-            
+			{ label = "Odium", url = "https://youtu.be/aAz8G2TYNig" },            
         },
     },
 }
@@ -722,7 +723,7 @@ FillRaidTutorialLinks['Ragnaros'] = {
             { label = "Wowmantrav", url = "https://www.youtube.com/watch?v=wATImgq4ij4&list=PLuZTM2O8dt2kleI2VATFJRmcjPPKcsfKZ&index=8" },
         },
         vip = {
-            
+			{ label = "Odium", url = "https://youtu.be/A0W3uU4HVho" },            
         },
     },
 }
