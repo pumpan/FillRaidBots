@@ -8950,19 +8950,31 @@ f:SetScript("OnEvent", function()
 end)
 
 local function shouldShowMessage(message)
-    local currentTime = GetTime() 
+    local currentTime = GetTime()
+    local pattern, cooldown
+
+    if type(message) ~= "string" then
+        return true
+    end
+
+    if type(messagesToHide) ~= "table" then
+        return true
+    end
+
     for pattern, cooldown in pairs(messagesToHide) do
-        if string.find(message, pattern) then
+        if type(pattern) == "string" and pattern ~= "" and string.find(message, pattern) then
+            cooldown = tonumber(cooldown) or 0
+
             if cooldown == 0 then
-                return false 
+                return false
             end
 
             local lastShown = messageCooldowns[pattern] or 0
             if currentTime - lastShown >= cooldown then
-                messageCooldowns[pattern] = currentTime 
+                messageCooldowns[pattern] = currentTime
                 return true
             else
-                return false 
+                return false
             end
         end
     end
@@ -8971,13 +8983,17 @@ end
 
 
 local function HideBotMessages(this, message, r, g, b, id)
-    if not FillRaidBotsSavedSettings.isBotMessagesEnabled then
+    if not this or not this.OriginalAddMessage then
+        return
+    end
+
+    if not FillRaidBotsSavedSettings or not FillRaidBotsSavedSettings.isBotMessagesEnabled then
         this:OriginalAddMessage(message, r, g, b, id)
         return
     end
 
     if not shouldShowMessage(message) then
-        return 
+        return
     end
 
     this:OriginalAddMessage(message, r, g, b, id)
